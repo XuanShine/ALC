@@ -103,10 +103,11 @@ class Chambre(models.Model):
     def __str__(self):
         return self.numero
 
+
 class PEC(models.Model):
     # Lors du renouvellement, la date de fin est modifié.
     # Une fin de prise en charge modifie la date de fin et facture la PEC
-    # Un changement de mois, facture la prise en charge et change la derniere_date_facturee
+    # Sur action, facture la prise en charge et change la derniere_date_facturee
     # Un changement de prix de la chambre facture la prise en charge et change le prix de la chambre
     # Un changement de chambre facture. Change la date facturation, change la chambre.
     famille = ForeignKey(Famille, on_delete=models.PROTECT, related_name="PEC")
@@ -123,8 +124,19 @@ class PEC(models.Model):
     def proche_fin(self):
         return self.date_fin + dt.timedelta(days=7) < timezone.now().date()
     
-    def facturation(self):
+    def facturation(self, date):
+
         pass
 
-    def fin_PEC(self):
+    def fin_PEC(self, nouveau_date_fin):
+        pass
+
+    def change_prix(self, chambre, nouveau_prix):
+        self.facturation()
+
+        query = self.chambres.filter(numero=chambre)
+        assert len(query) == 1  # TODO gérer l’erreur
+        query[0].prix = nouveau_prix
+
+    def change_chambre(self, ancienne_chambre, nouvelle_chambre):
         pass
