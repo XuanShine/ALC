@@ -1,6 +1,7 @@
 import datetime
 
 from django.db import models
+from django.db.models.fields.related import ForeignKey
 from django.utils import timezone
 
 # Create your models here.
@@ -25,25 +26,68 @@ class Choice(models.Model):
         return self.choice_text
     
 
-class Family(models.Model):
+class Famille(models.Model):
     nom = models.CharField(max_length=200)
+
+    def responsable(self):
+        query = self.membres.filter(est_responsable=True)
+        if not query:
+            return "Aucun indiqué"
+        else:
+            return " | ".join(map(str, query))
 
     def __str__(self):
         return self.nom
 
     def nombre(self):
-        return len(self.membre.all())
+        return len(self.membres.all())
 
-class Member(models.Model):
+class Membre(models.Model):
     nom = models.CharField(max_length=200)
     prenom = models.CharField(max_length=200)
+    sexe = models.CharField(max_length=200, blank=True, null=True)  # TODO: limiter le choix de sexe
     naissance = models.DateField()
     titre = models.CharField(max_length=200)  # père, mère, enfant
-    famille = models.ForeignKey(Family, on_delete=models.CASCADE, related_name="membre")
+    est_responsable = models.BooleanField(default=False)
+    famille = models.ForeignKey(Famille, on_delete=models.CASCADE, related_name="membres")
 
     def __str__(self):
-        return self.nom + " " + self.prenom
+        return self.nom + " " + self.prenom + " " + str(self.naissance.year)
     
     def age(self):
         return int((timezone.now().date() - self.naissance).days / 365.25)
 
+
+class Hotel(models.Model):
+    nom = models.CharField(max_length=200)
+    adresse = models.CharField(max_length=200)
+    telephone = models.CharField(max_length=200)
+    mail = models.EmailField()
+
+    def __str__(self):
+        return self.nom
+    
+    def disponibilite(self):
+        return len(self.chambres.filter(disponible=True))
+    
+
+
+class Chambre(models.Model):
+    numero = models.CharField(max_length=200)
+    convention = models.BooleanField(default=False)
+    capacite = models.IntegerField(default=2)
+    disponible = models.BooleanField(default=False)
+    prix = models.IntegerField(blank=True, null=True)
+
+    hotel = ForeignKey(Hotel, on_delete=models.CASCADE, related_name="chambres")
+    PEC = ForeignKey("PEC", on_delete=models.DO_NOTHING, blank=True, null=True, related_name="chambres")
+
+    def __str__(self):
+        return self.numero
+
+class PEC(models.Model):
+    # Lors du renouvellement, la date de fin est modifié.
+    famille = ForeignKey(Famille, on_delete=models.PROTECT, related_name="PEC")
+    date_debut = models.DateField()
+    date_fin = models.DateField()
+    derniere_date_facturee = models.DateField(blank=True, null=True)
