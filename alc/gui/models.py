@@ -57,7 +57,7 @@ class Membre(models.Model):
     )
     nom = models.CharField(max_length=200)
     prenom = models.CharField(max_length=200)
-    sexe = models.IntegerField(default=AUTRE, choice=SEXE)
+    sexe = models.IntegerField(default=AUTRE, choices=SEXE)
     naissance = models.DateField()
     titre = models.CharField(max_length=200)  # père, mère, enfant
     est_responsable = models.BooleanField(default=False)
@@ -122,10 +122,9 @@ class PEC(models.Model):
         self.date_fin = nouvelle_date_fin
     
     def proche_fin(self):
-        return self.date_fin + dt.timedelta(days=7) < timezone.now().date()
+        return self.date_fin + datetime.timedelta(days=7) < timezone.now().date()
     
     def facturation(self, date):
-
         pass
 
     def fin_PEC(self, nouveau_date_fin):

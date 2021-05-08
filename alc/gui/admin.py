@@ -31,3 +31,8 @@ class HotelAdmin(admin.ModelAdmin):
 
 admin.site.register(Hotel, HotelAdmin)
 admin.site.register(Chambre)
+
+class PECAdmin(admin.ModelAdmin):
+    inlines = [ChambreInline]
+
+admin.site.register(PEC, PECAdmin)
