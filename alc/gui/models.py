@@ -29,6 +29,9 @@ class Choice(models.Model):
 class Famille(models.Model):
     nom = models.CharField(max_length=200)
 
+    class Meta:
+        ordering = ["nom"]
+
     def responsable(self):
         query = self.membres.filter(est_responsable=True)
         if not query:
@@ -37,15 +40,24 @@ class Famille(models.Model):
             return " | ".join(map(str, query))
 
     def __str__(self):
-        return self.nom
+        return self.nom + " - " + str(self.id)
 
     def nombre(self):
         return len(self.membres.all())
 
 class Membre(models.Model):
+    AUTRE = 0
+    MALE = 1
+    FEMELE = 2
+    SEXE = (
+        (AUTRE, "Autre"),
+        (MALE, "Masculin"),
+        (FEMELE, "Féminin")
+        
+    )
     nom = models.CharField(max_length=200)
     prenom = models.CharField(max_length=200)
-    sexe = models.CharField(max_length=200, blank=True, null=True)  # TODO: limiter le choix de sexe
+    sexe = models.IntegerField(default=AUTRE, choice=SEXE)
     naissance = models.DateField()
     titre = models.CharField(max_length=200)  # père, mère, enfant
     est_responsable = models.BooleanField(default=False)
@@ -64,8 +76,11 @@ class Hotel(models.Model):
     telephone = models.CharField(max_length=200)
     mail = models.EmailField()
 
+    class Meta:
+        ordering = ["nom"]
+
     def __str__(self):
-        return self.nom
+        return self.nom + " - " + str(self.id)
     
     def disponibilite(self):
         return len(self.chambres.filter(disponible=True))
@@ -82,12 +97,34 @@ class Chambre(models.Model):
     hotel = ForeignKey(Hotel, on_delete=models.CASCADE, related_name="chambres")
     PEC = ForeignKey("PEC", on_delete=models.DO_NOTHING, blank=True, null=True, related_name="chambres")
 
+    class Meta:
+        ordering = ["numero"]
+
     def __str__(self):
         return self.numero
 
 class PEC(models.Model):
     # Lors du renouvellement, la date de fin est modifié.
+    # Une fin de prise en charge modifie la date de fin et facture la PEC
+    # Un changement de mois, facture la prise en charge et change la derniere_date_facturee
+    # Un changement de prix de la chambre facture la prise en charge et change le prix de la chambre
+    # Un changement de chambre facture. Change la date facturation, change la chambre.
     famille = ForeignKey(Famille, on_delete=models.PROTECT, related_name="PEC")
     date_debut = models.DateField()
     date_fin = models.DateField()
     derniere_date_facturee = models.DateField(blank=True, null=True)
+
+    class Meta:
+        ordering = ["date_fin"]
+    
+    def renouvellement(self, nouvelle_date_fin):
+        self.date_fin = nouvelle_date_fin
+    
+    def proche_fin(self):
+        return self.date_fin + dt.timedelta(days=7) < timezone.now().date()
+    
+    def facturation(self):
+        pass
+
+    def fin_PEC(self):
+        pass
