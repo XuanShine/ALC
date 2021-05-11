@@ -103,6 +103,12 @@ class Chambre(models.Model):
     def __str__(self):
         return self.numero
 
+    def disponible_pour_alc(self):
+        """Pour information"""
+        if (not self.PEC) or (not self.disponible):
+            return False
+        return True
+
 
 class PEC(models.Model):
     # Lors du renouvellement, la date de fin est modifié.
