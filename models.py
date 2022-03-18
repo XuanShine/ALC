@@ -2,7 +2,7 @@ import datetime
 
 from peewee import *
 
-db = SqliteDatabase('people.db')
+db = SqliteDatabase('alc.db')
 from datetime import timezone
 
 
@@ -12,7 +12,7 @@ class BaseModel(Model):
         database = db
 
 class Famille(BaseModel):
-    nom = CharField(max_length=200)
+    nom = CharField()
 
     def responsable(self):
         query = self.membres.filter(est_responsable=True)
@@ -37,11 +37,11 @@ class Membre(BaseModel):
         (FEMELE, "Féminin")
         
     )
-    nom = CharField(max_length=200)
-    prenom = CharField(max_length=200)
+    nom = CharField()
+    prenom = CharField()
     sexe = IntegerField(default=AUTRE, choices=SEXE)
     naissance = DateField()
-    titre = CharField(max_length=200)  # père, mère, enfant
+    titre = CharField()  # père, mère, enfant
     est_responsable = BooleanField(default=False)
     famille = ForeignKeyField(Famille, backref="membres")
 
@@ -53,9 +53,9 @@ class Membre(BaseModel):
 
 
 class Hotel(BaseModel):
-    nom = CharField(max_length=200)
-    adresse = CharField(max_length=200)
-    telephone = CharField(max_length=200)
+    nom = CharField()
+    adresse = CharField()
+    telephone = CharField()
     mail = CharField(max_length=100)
 
     def __str__(self):
@@ -66,29 +66,7 @@ class Hotel(BaseModel):
 
 
 class Employe(BaseModel):
-    nom = CharField(max_length=200)
-    
-
-
-class Chambre(BaseModel):
-    numero = CharField(max_length=200)
-    convention = BooleanField(default=False)
-    capacite = IntegerField(default=2)
-    disponible = BooleanField(default=False)
-    prix = IntegerField(blank=True, null=True)
-
-    hotel = ForeignKeyField(Hotel, backref="chambres")
-    PEC = ForeignKeyField("PEC", blank=True, null=True, backref="chambres")
-    
-
-    def __str__(self):
-        return self.numero
-
-    def disponible_pour_alc(self):
-        """Pour information"""
-        if (not self.PEC) or (not self.disponible):
-            return False
-        return True
+    nom = CharField()
 
 
 class PEC(BaseModel):
@@ -100,7 +78,7 @@ class PEC(BaseModel):
     famille = ForeignKeyField(Famille, backref="pec")
     date_debut = DateField()
     date_fin = DateField()
-    derniere_date_facturee = DateField( blank=True, null=True)
+    derniere_date_facturee = DateField(null=True)
     
     def renouvellement(self, nouvelle_date_fin):
         self.date_fin = nouvelle_date_fin
@@ -123,3 +101,23 @@ class PEC(BaseModel):
 
     def change_chambre(self, ancienne_chambre, nouvelle_chambre):
         pass
+
+
+class Chambre(BaseModel):
+    numero = CharField()
+    convention = BooleanField(default=False)
+    capacite = IntegerField(default=2)
+    disponible = BooleanField(default=False)
+    prix = IntegerField(null=True)
+    
+    hotel = ForeignKeyField(Hotel, backref="chambres")
+    pec = ForeignKeyField(PEC, backref="chambres")
+
+    def __str__(self):
+        return self.numero
+
+    def disponible_pour_alc(self):
+        """Pour information"""
+        if (not self.PEC) or (not self.disponible):
+            return False
+        return True
