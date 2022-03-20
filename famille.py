@@ -18,7 +18,7 @@ class Famille:
                                    ("Feminin", "F")]),
                 put_input(f"naissance{n}", type="date"),
                 put_input(f"titre{n}"),
-                put_checkbox(f"responsable{n}", options=["oui"])
+                put_checkbox(f"responsable{n}", options=["oui"]),
                 put_buttons("-")
             ])
         
