@@ -1,28 +1,30 @@
+from turtle import onclick
 from pywebio import start_server
 from pywebio.input import input
 from pywebio.output import *
 from pywebio_battery import put_logbox
+from famille import Famille
 
 from account import checkConnection
 
 class App:
     def __init__(self):
-        self.id = "1"
+        self.id = None
     
     def login(self, *args):
-        put_text(self.id)
         id_ = input("ID:")
         password = input("Mot de Passe:")
         assert checkConnection(id_, password)
         self.id = id_
-        put_text(self.id)
+        put_text(f"ID: {self.id}")
         self.menu()
     
     def menu(self):
-        put_button
+        put_buttons(["Ajouter une famille"], onclick=Famille.ajoutFamille)
         
     def start(self):
-        put_buttons(["Se Connecter", "S’inscrire"], onclick=self.login)
+        # put_buttons(["Se Connecter", "S’inscrire"], onclick=self.login)
+        self.menu()
 
 def main():
     App().start()

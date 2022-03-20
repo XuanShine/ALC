@@ -10,6 +10,8 @@ class BaseModel(Model):
 
 class Famille(BaseModel):
     nom = CharField(max_length=50)
+    telephone = CharField(max_length=20, null=True)
+    # TODO: notes
     # - historiques*
     # - pec+
     # - membres*
@@ -72,12 +74,18 @@ class PEC(BaseModel):
     # Sur action, facture la prise en charge et change la derniere_date_facturee
     # Un changement de prix de la chambre facture la prise en charge et change le prix de la chambre
     # Un changement de chambre facture. Change la date facturation, change la chambre.
-    famille = ForeignKeyField(Famille, backref="pec", null=True)
+    famille = ForeignKeyField(Famille, backref="pec")
     date_debut = DateField()
     date_fin = DateField()
     derniere_date_facturee = DateField(null=True)
     # - chambres*
     # - historiques*
+
+    def setChambres(self, idChambres):
+        for id_ in idChambres:
+            chambre = Chambre.get(id=id_)
+            chambre.pec = self
+            chambre.save()
     
     def renouvellement(self, nouvelle_date_fin):
         self.date_fin = nouvelle_date_fin
