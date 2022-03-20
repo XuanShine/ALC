@@ -1,7 +1,7 @@
 from peewee import *
 from datetime import date, datetime
 
-db = SqliteDatabase('alc.db')
+db = SqliteDatabase(None)
 
 class BaseModel(Model):
     class Meta:
@@ -72,7 +72,7 @@ class PEC(BaseModel):
     # Sur action, facture la prise en charge et change la derniere_date_facturee
     # Un changement de prix de la chambre facture la prise en charge et change le prix de la chambre
     # Un changement de chambre facture. Change la date facturation, change la chambre.
-    famille = ForeignKeyField(Famille, backref="pec")
+    famille = ForeignKeyField(Famille, backref="pec", null=True)
     date_debut = DateField()
     date_fin = DateField()
     derniere_date_facturee = DateField(null=True)
@@ -114,7 +114,7 @@ class Chambre(BaseModel):
     prix = IntegerField()
     
     hotel = ForeignKeyField(Hotel, backref="chambres")
-    pec = ForeignKeyField(PEC, backref="chambres")
+    pec = ForeignKeyField(PEC, backref="chambres", null=True)
     
     def famille(self):
         raise NotImplemented()
