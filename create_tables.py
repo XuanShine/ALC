@@ -8,7 +8,13 @@ def init_fake_datas():
     with db:
         db.drop_tables([Famille, Membre, Hotel, PEC, Chambre])
         db.create_tables([Famille, Membre, Hotel, PEC, Chambre])
-        Famille.create(nom="Nguyen")
+        nguyen = Famille.create(nom="Nguyen")
+        paul = Membre.create(prenom="Paul", sexe="M", naissance=date(1994, 10, 25), titre="Père", famille=nguyen, estResponsable=True)
+        julie = Membre.create(prenom="Julie", sexe="F", naissance=date(2019, 1, 5), titre="enfant", famille=nguyen)
+        nguyen2 = Famille.create(nom="Nguyen")
+        jean = Membre.create(prenom="Jean", sexe="M", naissance=date(1995, 12, 1), titre="Père", famille=nguyen2, estResponsable=True)
+        sarah = Membre.create(prenom="Sarah", sexe="F", naissance=date(2018, 2, 19), titre="enfant", famille=nguyen2)
+        
 
 if __name__ == "__main__":
     if len(sys.argv) == 1:

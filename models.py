@@ -47,7 +47,7 @@ class Membre(BaseModel):
         return int((date.today() - self.naissance).days / 365.25)
 
     def __str__(self):
-        return f"{self.prenom} {self.nomFamille()}"
+        return f"{self.prenom} {self.nomFamille()} ({self.sexe}) - {self.naissance}"
 
 
 class Hotel(BaseModel):
