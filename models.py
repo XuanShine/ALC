@@ -10,7 +10,8 @@ class BaseModel(Model):
 
 class Famille(BaseModel):
     nom = CharField(max_length=50)
-    telephone = CharField(max_length=20, null=True)
+    telephone = CharField(max_length=20, default="")
+    notes = TextField(default="")
     # TODO: notes
     # - historiques*
     # - pec+
@@ -38,6 +39,7 @@ class Membre(BaseModel):
     titre = CharField(max_length=50)
     estResponsable = BooleanField(default=False)
     famille = ForeignKeyField(Famille, backref="membres")
+    notes = TextField(default="")
     # - historiques*
     
     def nomFamille(self):
