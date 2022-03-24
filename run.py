@@ -3,7 +3,9 @@ from pywebio import start_server
 from pywebio.input import *
 from pywebio.output import *
 from pywebio_battery import put_logbox
+from pywebio.session import set_env
 from famille import Famille
+from functools import partial
 
 from create_tables import init_fake_datas
 
@@ -14,6 +16,7 @@ class App:
         self.id = None
         
     def start(self):
+        set_env(output_max_width="80%")
         # put_buttons(["Se Connecter", "S’inscrire"], onclick=self.login)
         self.menu()
         return
@@ -28,7 +31,7 @@ class App:
         return
     
     def menu(self):
-        put_buttons(["Ajouter une famille"], onclick=[Famille.formAjoutFamille])
+        put_buttons(["Ajouter / Rechercher une famille"], onclick=[Famille.formAjoutFamille])
         put_scope("main")
         return
 
@@ -36,4 +39,5 @@ def main():
     App().start()
     
 init_fake_datas()
+
 start_server(main, port=8080, debug=True)
