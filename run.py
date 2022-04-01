@@ -6,6 +6,7 @@ from pywebio_battery import put_logbox
 from pywebio.session import set_env
 from famille import Famille
 from functools import partial
+import hebergement as hotel
 
 from create_tables import init_fake_datas
 
@@ -31,7 +32,13 @@ class App:
         return
     
     def menu(self):
-        put_buttons(["Ajouter / Rechercher une famille"], onclick=[Famille.formAjoutFamille])
+        put_buttons(buttons=[
+            "Ajouter / Rechercher une famille",
+            "Gérer les hébergements"
+        ], onclick=[
+            Famille.formAjoutFamille,
+            hotel.gestion
+        ])
         put_scope("main")
         return
 
