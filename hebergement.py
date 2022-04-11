@@ -15,8 +15,9 @@ from utils import sure
 
 @use_scope("main", clear=True)
 def gestion():
-    """Affiche une barre de recherche "Nom hôtel" / "CP" / "Ville" avec un tri possible, et a liste des hotels"""
+    """Affiche une barre de recherche
+    "Nom hôtel" / "CP" / "Ville" avec un tri possible, et liste des hotels"""
     query = Chambre.select()
     
-    put_rows [for room in query
+    
     return

@@ -6,7 +6,7 @@ from pywebio.pin import *
 from functools import partial
 import models as db
 from typing import Union
-from datetime import datetime
+from datetime import datetime, date
 from peewee import fn
 
 from utils import sure
@@ -91,7 +91,7 @@ class Famille:
                 membre.prenom,
                 membre.nomFamille(),
                 str(membre.sexe),
-                membre.naissance.strftime("%d/%m/%Y"),
+                f'{membre.naissance.strftime("%d/%m/%Y")} ({int((date.today()-membre.naissance).days/365)} ans)',
                 membre.titre,
                 "oui" if membre.estResponsable else "non",
                 put_collapse("Notes", content=membre.notes),
