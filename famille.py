@@ -32,17 +32,22 @@ class Famille:
             input("Nom de la Famille", name="nomFamille"),
             input("Téléphone", name="telephone", help_text="Pour être efficace, ne mettez pas les deux premiers chiffres: 04 ou 06")
         ], validate=check_form)
-        if not familleNouvelle["nomFamille"]:
-            familleNouvelle["nomFamille"] = " "
-        if not familleNouvelle["telephone"]:
-            familleNouvelle["telephone"] = " "
-            
+        
         # on compare si le nom de famille lower est dans la base lower
         # et on compare si le tel sans espace est dans la base.
-        query = db.Famille.select().where(
-            (fn.LOWER(db.Famille.nom).contains(familleNouvelle["nomFamille"].lower())) |
-            (db.Famille.telephone.contains(familleNouvelle["telephone"].replace(" ", "")))
-        )
+        if not familleNouvelle["nomFamille"]:
+            query = db.Famille.select().where(
+                (db.Famille.telephone.contains(familleNouvelle["telephone"].replace(" ", "")))
+            )
+        elif not familleNouvelle["telephone"]:
+            query = db.Famille.select().where(
+                (fn.LOWER(db.Famille.nom).contains(familleNouvelle["nomFamille"].lower()))
+            )
+        else:
+            query = db.Famille.select().where(
+                (fn.LOWER(db.Famille.nom).contains(familleNouvelle["nomFamille"].lower())) |
+                (db.Famille.telephone.contains(familleNouvelle["telephone"].replace(" ", "")))
+            )
         
         if query:  # Si la famille existe
             put_markdown("## La famille semble exister")
