@@ -68,6 +68,9 @@ class Hotel(BaseModel):
     
     def disponibilite(self):
         return len(self.chambres.where(Chambre.disponible == True))
+    
+    def totalChambres(self):
+        return len(self.chambres)
 
 
 class PEC(BaseModel):
