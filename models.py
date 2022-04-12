@@ -137,6 +137,6 @@ class Chambre(BaseModel):
 
     def disponible_pour_alc(self):
         """Pour information"""
-        if (not self.PEC) or (not self.disponible):
+        if self.pec or (not self.disponible):
             return False
         return True
