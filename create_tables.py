@@ -35,7 +35,7 @@ def init_fake_datas():
             Chambre.create(numero=str(room2),
                            convention=False,
                            capacite=3,
-                           disponible=True,
+                           disponible=False,
                            prix=50,
                            hotel=panorama)
         
