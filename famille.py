@@ -1,3 +1,4 @@
+from click import edit
 from pywebio import start_server
 from pywebio.input import *
 from pywebio.output import *
@@ -8,6 +9,7 @@ import models as db
 from typing import Union
 from datetime import datetime, date
 from peewee import fn
+from pywebio.session import set_env
 
 from utils import sure
 
@@ -15,6 +17,8 @@ class Famille:
     @staticmethod
     @use_scope("main", clear=True)
     def formAjoutFamille():
+        set_env(input_panel_fixed=True, input_panel_init_height=175)
+        
         def render_famille(famille):
             put_column([
                 put_markdown(f"## {famille}"),
@@ -24,12 +28,13 @@ class Famille:
             ])
         
         def check_form(data):
-            if not data["nomFamille"] and not data["telephone"]:
-                return ("nomFamille", "Renseigner au moins un des deux champs")
+            if not data["nomFamille"] and not data["telephone"] and not data["id"]:
+                return ("nomFamille", "Renseigner au moins un des trois champs")
         #####
         
-        familleNouvelle = input_group("Ajouter / Rechercher une Famille (renseigner au moins un des deux champs)", [
+        familleNouvelle = input_group("Ajouter / Rechercher une Famille (renseigner au moins un des trois champs)", [
             input("Nom de la Famille", name="nomFamille"),
+            input("ID", name="id"),
             input("Téléphone", name="telephone", help_text="Pour être efficace, ne mettez pas les deux premiers chiffres: 04 ou 06")
         ], validate=check_form)
         
@@ -143,6 +148,12 @@ class Famille:
                     options=[("Oui", True), ("Non", False, True)], inline=True),
             textarea("Remarques", name="notes", value=membre.notes, readonly=True)
         ])
+        membre.prenom = editMembre["prenom"]
+        membre.nom = editMembre["nom"]
+        membre.sexe = editMembre["sexe"]
+        membre.titre = editMembre["titre"]
+        membre.estResponsable = editMembre["estResponsable"]
+        membre.save()
         return Famille.viewFamille(membre.famille.id)
 
     @staticmethod
