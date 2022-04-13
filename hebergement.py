@@ -18,15 +18,24 @@ from utils import sure
 @use_scope("main", clear=True)
 def gestion(tri: str = None, cp: str = None, ville: str = None, nom: str = None, occupation: int = None):
     """Affiche une barre de recherche
-    "Nom hôtel" / "CP" / "Ville" avec un tri possible, et liste des hotels"""
+    "Nom hôtel" / "CP" / "Ville" avec un tri possible, et liste des hotels
+    <tri>: str:  "cp" / "ville" / "nom"
+    """
     set_env(input_panel_fixed=False)
     
     with use_scope("config"):
         put_text("TRI:", inline=True)
-        put_buttons(["Code Postal", "Ville", "Nom"], onclick=[None, None, None])
+        put_buttons(["Code Postal", "Ville", "Nom"], onclick=[partial(gestion, tri="cp"), partial(gestion, tri="ville"), partial(gestion, tri="nom")])
     
-          
-    query = Hotel.select()
+    if tri == "cp":
+        sortKey = Hotel.cp
+    elif tri == "ville":
+        sortKey = Hotel.ville
+    elif tri == "nom":
+        sortKey = Hotel.nom
+    else:
+        sortKey = Hotel.cp
+    query = Hotel.select().order_by(sortKey)
     
     for hotel in query:
         try:
@@ -35,7 +44,10 @@ def gestion(tri: str = None, cp: str = None, ville: str = None, nom: str = None,
             chambres = hotel.chambres
         
         put_collapse(title=f"{hotel.cp} - {hotel.ville} - {hotel.nom} ({hotel.disponibilite()}/{hotel.totalChambres()} libres)", content=[
-                put_row([put_text(header) for header in ["Numéro", "Convention", "Capacité", "Libre ?", "Prix", "Action"]])
+            put_row([
+                put_button("Modifier", onclick=partial(editHotel, hotel))
+            ])] + [
+            put_row([put_text(header) for header in ["Numéro", "Convention", "Capacité", "Libre ?", "Prix", "Action"]])
             ] + [
             put_row([
                 put_text(room.numero), None,
@@ -43,20 +55,23 @@ def gestion(tri: str = None, cp: str = None, ville: str = None, nom: str = None,
                 put_text(room.capacite), None,
                 put_button(f'{"Libre" if room.disponible_pour_alc() else "Voir PEC"}', color=f'{"success" if room.disponible_pour_alc() else "danger"}', onclick=""), None,
                 put_text(room.prix), None,
-                put_text("")
+                put_button("Modifier")
                 
             ])
         for room in chambres])
     
     # ElasticSearch
-    query = Hotel.select()
-    noms = set()
-    cps = set()
-    villes = set()
-    for hotel in query:
-        noms.add(hotel.nom)
-        cps.add(hotel.cp)
-        villes.add(hotel.ville)
+    # query = Hotel.select()
+    # noms = set()
+    # cps = set()
+    # villes = set()
+    # for hotel in query:
+    #     noms.add(hotel.nom)
+    #     cps.add(hotel.cp)
+    #     villes.add(hotel.ville)
         
     actions(buttons=["Ajouter un hôtel"])
     return gestion(tri, cp, ville, nom, occupation)
+
+def editHotel(hotel):
+    return
