@@ -32,8 +32,12 @@ class Famille:
                 return ("nomFamille", "Renseigner au moins un des trois champs")
         #####
         
+        # ElasticSearch
+        elasticQuery = db.Famille.select()
+        noms = list(set(famille.nom for famille in elasticQuery))
+        
         familleNouvelle = input_group("Ajouter / Rechercher une Famille (renseigner au moins un des trois champs)", [
-            input("Nom de la Famille", name="nomFamille"),
+            input("Nom de la Famille", name="nomFamille", datalist=noms),
             input("ID", name="id"),
             input("Téléphone", name="telephone", help_text="Pour être efficace, ne mettez pas les deux premiers chiffres: 04 ou 06")
         ], validate=check_form)
