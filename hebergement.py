@@ -11,6 +11,7 @@ from typing import Union
 from datetime import datetime
 from peewee import fn
 import emojis
+from pywebio.session import set_env
 
 from utils import sure
 
@@ -18,20 +19,16 @@ from utils import sure
 def gestion(tri: str = None, cp: str = None, ville: str = None, nom: str = None, occupation: int = None):
     """Affiche une barre de recherche
     "Nom hôtel" / "CP" / "Ville" avec un tri possible, et liste des hotels"""
+    set_env(input_panel_fixed=False)
+    
     with use_scope("config"):
         put_text("TRI:", inline=True)
         put_buttons(["Code Postal", "Ville", "Nom"], onclick=[None, None, None])
-        
+    
+          
     query = Hotel.select()
     
     for hotel in query:
-        # put_row(size="auto 10px minmax(50px, 5%) 10px minmax(100px, 14%)", content=[
-        #     put_text(hotel.cp), None,
-        #     put_text(hotel.ville)
-        #     put_collapse(title=f"{hotel.cp} - {hotel.ville} - {hotel.nom} ({hotel.disponibilite()}/{hotel.totalChambres()} libres)", content=[
-                
-        #     ])
-        # ])
         try:
             chambres = sorted(hotel.chambres, key=lambda chambre: int(chambre.numero))
         except ValueError:
@@ -50,9 +47,16 @@ def gestion(tri: str = None, cp: str = None, ville: str = None, nom: str = None,
                 
             ])
         for room in chambres])
-    action = input_group("Recherche", inputs=[
-        input("Nom", name="nom"),
-        input("Code Postal", name="cp"),
-        input("ville")
-    ])
-    return
+    
+    # ElasticSearch
+    query = Hotel.select()
+    noms = set()
+    cps = set()
+    villes = set()
+    for hotel in query:
+        noms.add(hotel.nom)
+        cps.add(hotel.cp)
+        villes.add(hotel.ville)
+        
+    actions(buttons=["Ajouter un hôtel"])
+    return gestion(tri, cp, ville, nom, occupation)
