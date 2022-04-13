@@ -1,5 +1,5 @@
 from peewee import *
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 
 db = SqliteDatabase(None)
 
