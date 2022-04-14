@@ -40,11 +40,12 @@ def gestion(tri: str = None, cp: str = None, ville: str = None, nom: str = None,
         sortKey = Hotel.cp
     query = Hotel.select().order_by(sortKey)
     
-    openHotel = [openHotel] if len(openHotel <= 1) else openHotel
+    openHotel = openHotel if isinstance(openHotel, list) else [openHotel]
     for hotel in query:
         showHotel(hotel, open=(hotel in openHotel))
         
-    actions(buttons=["Ajouter un hôtel"])
+    actions(buttons=[("Ajouter un hôtel", addHotel)])
+    actions()
     return gestion(tri, cp, ville, nom, occupation)
 
 
@@ -60,7 +61,8 @@ def showHotel(hotel, open: bool = False):
 
         put_text(f"ID Hotel: {hotel.id}\n{hotel.hotelname}\n{hotel.adresse}\n{hotel.telephone}\n{hotel.mail}"),
         put_row([
-            put_button("Modifier", onclick=partial(editHotel, hotel))
+            put_button("Modifier", onclick=partial(editHotel, hotel)),
+            put_button("Ajouter Chambre", onclick=partial(addRoom, hotel))
         ]),
         put_row([put_text(header) for header in ["Numéro", "Convention", "Capacité", "Libre ?", "Prix", "Action"]])
         ] + [
@@ -107,3 +109,17 @@ def editRoom(room):
     room.save()
     return gestion(openHotel=room.hotel)
     
+    
+def addHotel():
+    datas = input_group(f"Modification {hotel.nom}", inputs=[
+        input("Telephone", name="telephone", value=hotel.telephone),
+        input("Mail", name="mail", value=hotel.mail, help_text="Pour des modifications importantes, veuillez contacter l’administrateur.")
+    ])
+    hotel.mail = datas["mail"]
+    hotel.telephone = datas["telephone"]
+    # TODO historique
+    hotel.save()
+
+
+def addRoom(hotel):
+    pass
