@@ -38,14 +38,17 @@ def gestion(tri: str = None, cp: str = None, ville: str = None, nom: str = None,
         sortKey = Hotel.nom
     else:
         sortKey = Hotel.cp
+    # breakpoint()
     query = Hotel.select().order_by(sortKey)
     
     openHotel = openHotel if isinstance(openHotel, list) else [openHotel]
     for hotel in query:
         showHotel(hotel, open=(hotel in openHotel))
         
-    actions(buttons=[("Ajouter un hôtel", addHotel)])
-    actions()
+    action = actions("", buttons=[("Ajouter un hôtel", "addHotel")])
+    if action == "addHotel":
+        return addHotel()
+    # actions()
     return gestion(tri, cp, ville, nom, occupation)
 
 
@@ -111,7 +114,8 @@ def editRoom(room):
     
     
 def addHotel():
-    datas = input_group(f"Modification {hotel.nom}", inputs=[
+    datas = input_group(f"Ajout hôtel", inputs=[
+        input("Nom", name="nom"),
         input("Telephone", name="telephone", value=hotel.telephone),
         input("Mail", name="mail", value=hotel.mail, help_text="Pour des modifications importantes, veuillez contacter l’administrateur.")
     ])
