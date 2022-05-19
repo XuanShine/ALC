@@ -1,6 +1,7 @@
 from pywebio.output import *
 from pywebio.input import *
 from pywebio.pin import *
+from pywebio.session import local
 from functools import partial
 
 def sure(ifYes, ifNo, text="Êtes-vous sûr ?", textOui="Oui", textNon="Non"):
@@ -12,3 +13,7 @@ def sure(ifYes, ifNo, text="Êtes-vous sûr ?", textOui="Oui", textNon="Non"):
             put_button(textOui, onclick=partial(wrapper, ifYes)),
             put_button(textNon, onclick=partial(wrapper, ifNo))
         ])
+
+def clearFamille():
+    local.famille = None
+    clear("famille")
