@@ -1,6 +1,7 @@
 from pywebio import start_server
 from pywebio.input import *
 from pywebio.output import *
+from pywebio.session import local
 from pywebio_battery import put_logbox
 from pywebio.pin import *
 from functools import partial
@@ -10,7 +11,9 @@ from datetime import datetime, date
 from peewee import fn
 from pywebio.session import set_env
 
-from utils import sure
+import pec
+
+from utils import sure, clearFamille
 
 class Famille:
     @staticmethod
@@ -112,8 +115,22 @@ class Famille:
             ],
             header=["Prénom", "Nom", "Sexe", "Naissance", "Titre", "Responsable", "Notes", "Action"]
         )
-        action = actions("", buttons=[("Changer Telephone", "tel"),
-                                      ("Ajouter Membre", "new")])
+        put_markdown(f"### Prise en Charge (PEC):")
+        if not famille.pec.count():
+            put_text(f"Aucun")
+        else:
+            for pec in famille.pecs:
+                put_text(f"Début : {pec.date_debut}\nFin : {pec.date_fin}\nDernière date Facturée : {pec.derniere_date_facturee}")
+                for chambre in pec.chambres:
+                    put_text(f"{chambre.hotel.nom} - {chambre.hotel.ville} : {chambre.numero}")
+        action = actions("", buttons=[{"label": "Changer Telephone", "value": "tel"},
+                                      {"label": "Ajouter Membre", "value": "new"},
+                                      {"label": "Créer une PEC", "value": "createPec",
+                                       "disabled": famille.pec.count() != 0,
+                                       "color": "danger"},
+                                      {"label": "Voir la PEC", "value": "viewPec",
+                                       "disabled": famille.pec.count() == 0,
+                                       "color": "danger"}])
  
         if action == "tel":
             telephone = input("Telephone")
@@ -135,6 +152,12 @@ class Famille:
             ])
             if nouveauMembre:
                 db.Membre.create(**nouveauMembre, famille=famille)
+        elif action == "createPec" or action == "viewPec":
+            local.famille = famille
+            with use_scope("famille", clear=True):
+                put_markdown(f"##Famille sélectionnée: {local.famille}")
+                put_button("Enlever famille", onclick=clearFamille, color="danger")
+            return pec.viewPec(famille=famille)
         return Famille.viewFamille(familleID)
     
     @staticmethod
