@@ -79,7 +79,7 @@ class PEC(BaseModel):
     # Sur action, facture la prise en charge et change la derniere_date_facturee
     # Un changement de prix de la chambre facture la prise en charge et change le prix de la chambre
     # Un changement de chambre facture. Change la date facturation, change la chambre.
-    famille = ForeignKeyField(Famille, backref="pec")
+    famille = ForeignKeyField(Famille, backref="pecs")
     date_debut = DateField()
     date_fin = DateField()
     derniere_date_facturee = DateField(null=True)
