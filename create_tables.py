@@ -10,10 +10,10 @@ def init_fake_datas():
         db.create_tables([Famille, Membre, Hotel, PEC, Chambre])
         nguyen = Famille.create(nom="Nguyen")
         paul = Membre.create(prenom="Paul", sexe="M", naissance=date(1994, 10, 25), titre="Père", famille=nguyen, estResponsable=True)
-        julie = Membre.create(prenom="Julie", sexe="F", naissance=date(2019, 1, 5), titre="enfant", famille=nguyen)
+        sarah = Membre.create(prenom="Sarah", sexe="F", naissance=date(2019, 1, 5), titre="enfant", famille=nguyen)
         nguyen2 = Famille.create(nom="Nguyen")
         jean = Membre.create(prenom="Jean", sexe="M", naissance=date(1995, 12, 1), titre="Père", famille=nguyen2, estResponsable=True)
-        sarah = Membre.create(prenom="Sarah", sexe="F", naissance=date(2018, 2, 19), titre="enfant", famille=nguyen2)
+        julie = Membre.create(prenom="Julie", sexe="F", naissance=date(2018, 2, 19), titre="enfant", famille=nguyen2)
         
         panorama = Hotel(nom="Panorama",
                          hotelname="hotelpanorama",
