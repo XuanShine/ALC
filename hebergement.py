@@ -47,7 +47,7 @@ def gestion(tri: str = None, cp: str = None, ville: str = None, nom: str = None,
         
     action = actions("", buttons=[("Ajouter un hôtel", "addHotel")])
     if action == "addHotel":
-        return addHotel()
+        addHotel()
     # actions()
     return gestion(tri, cp, ville, nom, occupation)
 
@@ -116,14 +116,25 @@ def editRoom(room):
 def addHotel():
     datas = input_group(f"Ajout hôtel", inputs=[
         input("Nom", name="nom"),
-        input("Telephone", name="telephone", value=hotel.telephone),
-        input("Mail", name="mail", value=hotel.mail, help_text="Pour des modifications importantes, veuillez contacter l’administrateur.")
+        input("Identifiant Hotel", name="hotelname"),
+        input("Adresse", name="adresse"),
+        input("Ville", name="ville"),
+        input("CP", name="cp"),
+        input("Telephone", name="telephone"),
+        input("Mail", name="mail")
     ])
-    hotel.mail = datas["mail"]
-    hotel.telephone = datas["telephone"]
-    # TODO historique
-    hotel.save()
+    Hotel.create(**datas)
+    return
 
 
 def addRoom(hotel):
-    pass
+    datas = input_group(f"Ajout Chambre", inputs=[
+        input("Numéro", name="numero"),
+        # input("Convention", name="convention"),
+        radio("Convention", options=[("oui", True), ("non", False, True)], inline=True, name="convention"),
+        input("Capacite", name="capacite", type="number"),
+        input("Prix journalier", name="prix"),
+        radio("Disponible", options=[("oui", True), ("non", False, True)], inline=True, name="disponible"),
+    ])
+    Chambre.create(hotel=hotel, **datas)
+    return gestion(openHotel=hotel)
