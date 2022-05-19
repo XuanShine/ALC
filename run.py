@@ -3,6 +3,7 @@ from pywebio import start_server
 from pywebio.input import *
 from pywebio.output import *
 from pywebio_battery import put_logbox
+from pywebio.session import local
 from pywebio.session import set_env
 from famille import Famille
 from functools import partial
@@ -39,6 +40,7 @@ class App:
             Famille.formAjoutFamille,
             hotel.gestion
         ])
+        put_scope("famille")
         put_scope("main")
         return
 
