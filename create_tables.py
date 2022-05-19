@@ -2,6 +2,8 @@ import sys
 
 from models import *
 
+from datetime import datetime, date
+
 
 def init_fake_datas():
     db.init("local.db")
@@ -10,7 +12,7 @@ def init_fake_datas():
         db.create_tables([Famille, Membre, Hotel, PEC, Chambre])
         nguyen = Famille.create(nom="Nguyen")
         paul = Membre.create(prenom="Paul", sexe="M", naissance=date(1994, 10, 25), titre="Père", famille=nguyen, estResponsable=True)
-        sarah = Membre.create(prenom="Sarah", sexe="F", naissance=date(2019, 1, 5), titre="enfant", famille=nguyen)
+        fils1 = Membre.create(prenom="Edoardo", sexe="M", naissance=date(2019, 1, 5), titre="enfant", famille=nguyen)
         nguyen2 = Famille.create(nom="Nguyen")
         jean = Membre.create(prenom="Jean", sexe="M", naissance=date(1995, 12, 1), titre="Père", famille=nguyen2, estResponsable=True)
         julie = Membre.create(prenom="Julie", sexe="F", naissance=date(2018, 2, 19), titre="enfant", famille=nguyen2)
@@ -55,6 +57,13 @@ def init_fake_datas():
                            disponible=True,
                            prix=30,
                            hotel=laposte)
+        
+        pec = PEC.create(famille=nguyen,
+                   date_debut=datetime(2022, 4, 2).date(),
+                   date_fin=datetime(2022, 5, 25).date(),
+                   derniere_date_facturee=datetime(2022, 6, 1))
+        
+        pec.setChambres([1])
         
         
 
