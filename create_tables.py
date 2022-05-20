@@ -61,7 +61,7 @@ def init_fake_datas():
         pec = PEC.create(famille=nguyen,
                    date_debut=datetime(2022, 4, 2).date(),
                    date_fin=datetime(2022, 5, 25).date(),
-                   derniere_date_facturee=datetime(2022, 6, 1))
+                   derniere_date_facturee=datetime(2022, 5, 1))
         
         pec.setChambres([1])
         
