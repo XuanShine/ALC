@@ -5,15 +5,18 @@ from pywebio.input import *
 from pywebio.output import *
 from pywebio_battery import put_logbox
 from pywebio.pin import *
+from pywebio.session import set_env, local
+
 from functools import partial
-from models import *
 from typing import Union
 from datetime import datetime
+
 from peewee import fn
 import emojis
-from pywebio.session import set_env
 
+from models import *
 from utils import sure
+import famille
 
 
 @use_scope("main", clear=True)
@@ -73,13 +76,38 @@ def showHotel(hotel, open: bool = False):
             put_text(f"{room.numero} {'' if not room.numeroTemporaire else '-> ' + room.numeroTemporaire}"), None,
             put_text(emojis.encode(":white_check_mark:") if room.convention else emojis.encode(":x:")), None,
             put_text(room.capacite), None,
-            put_button(f'{"Libre" if room.disponible_pour_alc() else "Voir PEC"}', color=f'{"success" if room.disponible_pour_alc() else "danger"}', onclick=""), None,
+            put_button(f'{"Sélectionner" if room.disponible_pour_alc() else "Voir PEC"}', color=f'{"success" if room.disponible_pour_alc() else "danger"}', onclick=partial(actionRoom, room)), None,
             put_text(room.prix), None,
             put_button("Modifier", onclick=partial(editRoom, room))
         ]) for room in chambres])
     return
 
-
+def actionRoom(room):
+    """Action sur la chambre lors du click
+    - Aucun local.famille -> message d’information
+    - Présence d’un local.famille:
+        -> la chambre n’est pas <disponible_pour_alc> -> message d’erreur
+        -> la chambre est déjà dans le local.chambres
+        -> la chambre est disponible -> on ajoute au scope("chambre"). On reload "chambre"
+    """
+    if local.famille is None and room.pec:
+        return famille.GestionFamille.viewFamille(room.pec.famille.id)
+    if local.famille is None:
+        toast("Aucune famille n’est sélectionnée pour créer une nouvelle prise en charge", color="error")
+    elif not room.disponible_pour_alc():
+        toast("Chambre non disponible", color="error")
+    else:
+        if local.chambres is None:
+            clear("chambres")
+            local.chambres = [room]
+        elif room in local.chambres:
+            toast("Chambre déjà sélectionnée", color="error")
+            return 
+        else:
+            local.chambres.append(room)
+        toast("Chambre sélectionnée", color="success")
+        put_markdown(f"**{room.hotel}: {room}**", scope="chambres")
+        
 def editHotel(hotel):
     set_env(input_panel_fixed=True)
     datas = input_group(f"Modification {hotel.nom}", inputs=[
