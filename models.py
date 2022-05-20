@@ -1,5 +1,6 @@
 from peewee import *
-from datetime import date, datetime, timezone
+from typing import List
+from datetime import date, datetime, timedelta
 
 db = SqliteDatabase(None)
 
@@ -26,7 +27,7 @@ class Famille(BaseModel):
             return " | ".join(map(str, query))
 
     def __str__(self):
-        return self.nom + " - " + str(self.id)
+        return f"{self.nom} - (id:{self.id})"
 
     def nombre(self):
         return len(self.membres)
@@ -63,8 +64,8 @@ class Hotel(BaseModel):
     # chambres*
 
     def __str__(self):
-        """return ex: (id=34) Hotel Panorama - Grasse"""
-        return f"{self.id=} {self.nom} - {self.ville}"
+        """return ex: (id:34) Hotel Panorama - Grasse"""
+        return f"(id:{self.id}) {self.nom} - {self.ville}"
     
     def disponibilite(self):
         return len(self.chambres.where(Chambre.disponible == True))
@@ -80,47 +81,102 @@ class PEC(BaseModel):
     # Un changement de prix de la chambre facture la prise en charge et change le prix de la chambre
     # Un changement de chambre facture. Change la date facturation, change la chambre.
     famille = ForeignKeyField(Famille, backref="pecs")
+    hotel = ForeignKeyField(Hotel, backref="pecs", null=True)
     date_debut = DateField()
     date_fin = DateField()
-    derniere_date_facturee = DateField(null=True)
+    _derniere_date_facturee = DateField(null=True)
+    historique_chambres = CharField(default="")
+    fin_pec = BooleanField(default=False)
     # - chambres*
     # - historiques*
+    
+    @property
+    def derniere_date_facturee(self):
+        if not self._derniere_date_facturee:
+            self._derniere_date_facturee = self.date_debut
+        return self._derniere_date_facturee
 
-    def setChambres(self, idChambres):
+    @derniere_date_facturee.setter
+    def derniere_date_facturee(self, date_facture):
+        self._derniere_date_facturee = date_facture
+        
+    def setChambres(self, idChambres: List[int]):
         for id_ in idChambres:
             chambre = Chambre.get(id=id_)
             chambre.pec = self
             chambre.save()
+            self.historique_chambres += f"{chambre}, "
+            # breakpoint()
+            self.hotel = chambre.hotel
+        self.save()
+        # breakpoint()
     
     def renouvellement(self, nouvelle_date_fin):
+        assert nouvelle_date_fin >= self.derniere_date_facturee
         self.date_fin = nouvelle_date_fin
+        self.save()
     
     def proche_fin(self):
-        return self.date_fin + datetime.timedelta(days=7) < timezone.now().date()
+        return self.date_fin < timedelta(days=7) + datetime.now().date()
+    
+    def retard_pec(self):
+        return (not self.fin_pec) and self.date_fin < datetime.now().date()
+    
+    def actuelle(self):
+        return not self.fin_pec
     
     def facturation(self, date):
-        pass
+        """
+        assert date_derniere_facture < date < date_fin
+        Pour facturer:
+        Quand on facture, on facture à la date où le client "part"
+        1/ On calcul le nombre de jour entre la <date> et <date_derniere_fature>
+        2/ Pour chaque chambre, on le multiplie par le prix
+        3/ On édite une demande de facture.
+        4/ On change la <date_derniere_facture>
+        """
+        assert self.derniere_date_facturee <= date <= self.date_fin
+        days = (date - self.derniere_date_facturee).days
+        res = sum(days * chambre.prix for chambre in self.chambres)
+        self.derniere_date_facturee = date
+        self.save()
+        return res
 
     def fin_PEC(self, nouveau_date_fin):
-        pass
+        """Fin PEC:
+        1/ On facture
+        2/ On change .fin_pec = True
+        3/ On change .chambres.pec = None
+        4/ On change date_fin
+        """
+        self.date_fin = nouveau_date_fin
+        res = self.facturation(nouveau_date_fin)
+        self.fin_pec = True
+        for chambre in self.chambres:
+            chambre.pec = None
+            chambre.save()
+        self.save()
+        return res
 
-    def change_prix(self, chambre, nouveau_prix):
-        self.facturation()
-
-        query = self.chambres.filter(numero=chambre)
-        assert len(query) == 1  # TODO gérer l’erreur
-        query[0].prix = nouveau_prix
+    def get_chambres(self):
+        return self.historique_chambres if self.fin_pec else " ".join(map(str, self.chambres))
 
     def change_chambre(self, ancienne_chambre, nouvelle_chambre):
         pass
-    
-    def hotel(self):
-        raise NotImplemented()
+
+    def style(self):
+        "style for pywebio"
+        if self.retard_pec():
+            return "background-color: red;"
+        if self.proche_fin():
+            return "background-color: orange;"
+        else:
+            return ""
     
 
 class Chambre(BaseModel):
     numero = CharField()
-    numeroTemporaire = CharField(null=True)
+    numeroTemporaire = CharField(default="")
     convention = BooleanField(default=False)
     capacite = SmallIntegerField(default=2)
     disponible = BooleanField(default=False)
@@ -133,7 +189,8 @@ class Chambre(BaseModel):
         raise NotImplemented()
 
     def __str__(self):
-        return self.numero
+        add_str = f" ({self.numeroTemporaire})" if self.numeroTemporaire else ""
+        return f"{self.numero}" + add_str
 
     def disponible_pour_alc(self):
         """Pour information"""
