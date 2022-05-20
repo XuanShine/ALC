@@ -1,16 +1,15 @@
-from mimetypes import init
 from pywebio import start_server
 from pywebio.input import *
 from pywebio.output import *
 from pywebio_battery import put_logbox
 from pywebio.session import local
 from pywebio.session import set_env
-from famille import Famille
+
 from functools import partial
+
+from famille import GestionFamille
 import hebergement as hotel
-
 from create_tables import init_fake_datas
-
 from account import checkConnection
 
 class App:
@@ -37,7 +36,7 @@ class App:
             "Ajouter / Rechercher une famille",
             "Gérer les hébergements"
         ], onclick=[
-            Famille.formAjoutFamille,
+            GestionFamille.formAjoutFamille,
             hotel.gestion
         ])
         put_scope("famille")
