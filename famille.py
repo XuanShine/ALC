@@ -1,21 +1,22 @@
+from logging import warning
+from functools import partial
+from typing import Union
+from datetime import datetime, date
+
 from pywebio import start_server
 from pywebio.input import *
 from pywebio.output import *
-from pywebio.session import local
+from pywebio.session import local, set_env
 from pywebio_battery import put_logbox
 from pywebio.pin import *
-from functools import partial
-import models as db
-from typing import Union
-from datetime import datetime, date
+
 from peewee import fn
-from pywebio.session import set_env
 
+from models import *
 import pec
+from utils import sure, selectCalendar
 
-from utils import sure, clearFamille
-
-class Famille:
+class GestionFamille:
     @staticmethod
     @use_scope("main", clear=True)
     def formAjoutFamille():
@@ -35,7 +36,7 @@ class Famille:
         #####
         
         # ElasticSearch
-        elasticQuery = db.Famille.select()
+        elasticQuery = Famille.select()
         noms = list(set(famille.nom for famille in elasticQuery))
         
         familleNouvelle = input_group("Ajouter / Rechercher une Famille (renseigner au moins un des trois champs)", [
@@ -47,17 +48,17 @@ class Famille:
         # on compare si le nom de famille lower est dans la base lower
         # et on compare si le tel sans espace est dans la base.
         if not familleNouvelle["nomFamille"]:
-            query = db.Famille.select().where(
-                (db.Famille.telephone.contains(familleNouvelle["telephone"].replace(" ", "")))
+            query = Famille.select().where(
+                (Famille.telephone.contains(familleNouvelle["telephone"].replace(" ", "")))
             )
         elif not familleNouvelle["telephone"]:
-            query = db.Famille.select().where(
-                (fn.LOWER(db.Famille.nom).contains(familleNouvelle["nomFamille"].lower()))
+            query = Famille.select().where(
+                (fn.LOWER(Famille.nom).contains(familleNouvelle["nomFamille"].lower()))
             )
         else:
-            query = db.Famille.select().where(
-                (fn.LOWER(db.Famille.nom).contains(familleNouvelle["nomFamille"].lower())) |
-                (db.Famille.telephone.contains(familleNouvelle["telephone"].replace(" ", "")))
+            query = Famille.select().where(
+                (fn.LOWER(Famille.nom).contains(familleNouvelle["nomFamille"].lower())) |
+                (Famille.telephone.contains(familleNouvelle["telephone"].replace(" ", "")))
             )
         
         if query:  # Si la famille existe
@@ -74,7 +75,7 @@ class Famille:
                     "color": "success"
                 }])
             if selectFamille != 0:
-                return Famille.viewFamille(selectFamille)
+                return GestionFamille.viewFamille(selectFamille)
 
         # La famille n’existe pas     
         action = actions("La famille n’existe pas. Voulez-vous la créer ?", buttons=[
@@ -83,19 +84,19 @@ class Famille:
         ])
         
         if action:
-            famille = db.Famille.create(nom=familleNouvelle["nomFamille"], telephone=familleNouvelle["telephone"])
-            return Famille.viewFamille(famille.id)
+            famille = Famille.create(nom=familleNouvelle["nomFamille"], telephone=familleNouvelle["telephone"])
+            return GestionFamille.viewFamille(famille.id)
         else:
-            return Famille.formAjoutFamille()
+            return GestionFamille.formAjoutFamille()
     
     @staticmethod
     @use_scope("main", clear=True)
     def viewFamille(familleID: int):
-        famille = db.Famille.get(id=familleID)
-        put_markdown(f"## Famille: {famille.nom}")
+        famille = Famille.get(id=familleID)
+        put_markdown(f"## Famille: {famille}")
         put_text(f"Telephone: {famille.telephone}")
         put_scrollable(content=["Notes", famille.notes], keep_bottom=True, height=150)
-        put_button("Ajouter Note", onclick=partial(Famille.addRemarque, famille))
+        # put_button("Ajouter Note", onclick=partial(Famille.addRemarque, famille))
         put_markdown(f"### Membres ({len(famille.membres)})")
         put_table([
             [
@@ -107,30 +108,28 @@ class Famille:
                 "oui" if membre.estResponsable else "non",
                 put_collapse("Notes", content=membre.notes),
                 put_row([
-                    put_button("Ajouter Note", onclick=partial(Famille.addRemarque, membre)), None,
-                    put_button("Changer Informations", onclick=partial(Famille.editMembre, membre.id)), None,
-                    put_button("Supprimer", onclick=partial(sure, ifYes=partial(Famille.deleteMembre, membre), ifNo=close_popup)), None
+                    put_button("Ajouter Note", onclick=partial(GestionFamille.addRemarque, membre)), None,
+                    put_button("Changer Informations", onclick=partial(GestionFamille.editMembre, membre.id)), None,
+                    put_button("Supprimer", onclick=partial(sure, ifYes=partial(GestionFamille.deleteMembre, membre), ifNo=close_popup)), None
                 ])
             ] for membre in famille.membres
             ],
             header=["Prénom", "Nom", "Sexe", "Naissance", "Titre", "Responsable", "Notes", "Action"]
         )
         put_markdown(f"### Prise en Charge (PEC):")
-        if not famille.pec.count():
+        if not famille.pecs.count():
             put_text(f"Aucun")
         else:
-            for pec in famille.pecs:
-                put_text(f"Début : {pec.date_debut}\nFin : {pec.date_fin}\nDernière date Facturée : {pec.derniere_date_facturee}")
-                for chambre in pec.chambres:
-                    put_text(f"{chambre.hotel.nom} - {chambre.hotel.ville} : {chambre.numero}")
+            GestionFamille.viewPecs(famille)
+            # for pec in famille.pecs:
+            #     put_text(f"Début : {pec.date_debut}\nFin : {pec.date_fin}\nDernière date Facturée : {pec.derniere_date_facturee}")
+            #     for chambre in pec.chambres:
+            #         put_text(f"{chambre.hotel.nom} - {chambre.hotel.ville} : {chambre.numero}")
         action = actions("", buttons=[{"label": "Changer Telephone", "value": "tel"},
                                       {"label": "Ajouter Membre", "value": "new"},
-                                      {"label": "Créer une PEC", "value": "createPec",
-                                       "disabled": famille.pec.count() != 0,
-                                       "color": "danger"},
-                                      {"label": "Voir la PEC", "value": "viewPec",
-                                       "disabled": famille.pec.count() == 0,
-                                       "color": "danger"}])
+                                      {"label": "Ajouter notes", "value": "addNotes"},
+                                      {"label": "Créer une PEC", "value": "newPEC", "color": "warning"}
+                                     ])
  
         if action == "tel":
             telephone = input("Telephone")
@@ -151,18 +150,17 @@ class Famille:
                 textarea("Remarques", name="notes")
             ])
             if nouveauMembre:
-                db.Membre.create(**nouveauMembre, famille=famille)
-        elif action == "createPec" or action == "viewPec":
-            local.famille = famille
-            with use_scope("famille", clear=True):
-                put_markdown(f"##Famille sélectionnée: {local.famille}")
-                put_button("Enlever famille", onclick=clearFamille, color="danger")
-            return pec.viewPec(famille=famille)
-        return Famille.viewFamille(familleID)
+                Membre.create(**nouveauMembre, famille=famille)
+        elif action == "addNotes":
+            GestionFamille.addRemarque(famille)
+        elif action == "newPEC":
+            put_info("Veuillez choisir une ou plusieurs chambres pour la famille")
+            return pec.newPec(famille)
+        return GestionFamille.viewFamille(familleID)
     
     @staticmethod
     def editMembre(membreID):
-        membre = db.Membre.get(id=membreID)
+        membre = Membre.get(id=membreID)
         editMembre = input_group(f"{membre.prenom} {membre.nomFamille()}", cancelable=True, inputs=[
             input("Prénom", name="prenom", required=True, value=membre.prenom),
             input("Nom", name="nom", value=membre.nomFamille()),
@@ -180,24 +178,44 @@ class Famille:
         membre.titre = editMembre["titre"]
         membre.estResponsable = editMembre["estResponsable"]
         membre.save()
-        return Famille.viewFamille(membre.famille.id)
+        return GestionFamille.viewFamille(membre.famille.id)
 
     @staticmethod
-    def deleteMembre(membre: db.Membre):
+    def deleteMembre(membre: Membre):
         famille = membre.famille
         membre.delete_instance()
-        return Famille.viewFamille(famille.id)
+        return GestionFamille.viewFamille(famille.id)
 
     @staticmethod
-    def addRemarque(cible: Union[db.Membre, db.Famille]):
+    def addRemarque(cible: Union[Membre, Famille]):
         note = textarea("Ajouter une note:")
         # TODO: ajouter le nom de la personne qui a écrit la note
         time = datetime.now().strftime("%d/%m/%Y - %H:%M")
         cible.notes = f"{cible.notes}\n{'-' * 10}\n{time} :\n{note}"
         cible.save()
-        if isinstance(cible, db.Membre):
+        if isinstance(cible, Membre):
             famille = cible.famille
-        elif isinstance(cible, db.Famille):
+        elif isinstance(cible, Famille):
             famille = cible
-        return Famille.viewFamille(famille.id)
+        return GestionFamille.viewFamille(famille.id)
     
+    @staticmethod
+    def viewPecs(famille):
+        #breakpoint()
+        put_table([
+            [
+                pec.date_debut.strftime("%d/%m/%Y"),
+                pec.derniere_date_facturee.strftime("%d/%m/%Y"),
+                put_text(pec.date_fin.strftime("%d/%m/%Y")).style(pec.style()),
+                "Fini" if pec.fin_pec else "En Cours",
+                pec.hotel,
+                pec.get_chambres(),
+                put_row([
+                    put_button("Fin Prise en Charge", onclick=partial(selectCalendar, pec.fin_PEC, GestionFamille.viewFamille, famille)), None,
+                    put_button("Facturer", onclick=partial(selectCalendar, pec.facturation, GestionFamille.viewFamille, famille)), None,
+                    put_button("Prolonger/Tronquer", onclick=partial(selectCalendar, pec.renouvellement, GestionFamille.viewFamille, famille)), None
+                ])
+            ] for pec in famille.pecs
+            ],
+            header=["Début", "Dernière Facture", "Fin Prévu", "État", "Hôtel", "Chambre", "Action"]
+        )
