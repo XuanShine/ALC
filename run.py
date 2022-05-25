@@ -60,5 +60,5 @@ app.add_url_rule("/", "webio_view", webio_view(App().start, cdn="https://cdn.jsd
 
 
 if __name__ == "__main__":
-    app.run()
+    app.run(host="0.0.0.0", port=5001)
     # pywebio.platform.flask.start_server(App().start, port=8080, debug=True)
