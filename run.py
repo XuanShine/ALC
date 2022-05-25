@@ -56,9 +56,9 @@ init_fake_datas()
 
 # start_server(main, port=8080, debug=True)
 
-# app.add_url_rule("/app", "webio_view", webio_view(App().start), methods=["GET", "POST", "OPTIONS"])
+app.add_url_rule("/", "webio_view", webio_view(App().start, cdn="https://cdn.jsdelivr.net/gh/wang0618/PyWebIO-assets@v1.6.1/"), methods=["GET", "POST", "OPTIONS"])
 
 
 if __name__ == "__main__":
-    # app.run()
-    pywebio.platform.flask.start_server(App().start, port=8080, debug=True)
+    app.run()
+    # pywebio.platform.flask.start_server(App().start, port=8080, debug=True)
