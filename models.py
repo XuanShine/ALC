@@ -68,7 +68,7 @@ class Hotel(BaseModel):
         return f"(id:{self.id}) {self.nom} - {self.ville}"
     
     def disponibilite(self):
-        return len(self.chambres.where(Chambre.disponible == True))
+        return len([chambre for chambre in self.chambres if chambre.disponible_pour_alc()])
     
     def totalChambres(self):
         return len(self.chambres)
@@ -104,6 +104,7 @@ class PEC(BaseModel):
         for id_ in idChambres:
             chambre = Chambre.get(id=id_)
             chambre.pec = self
+            chambre.disponible = False
             chambre.save()
             self.historique_chambres += f"{chambre}, "
             # breakpoint()
@@ -154,6 +155,7 @@ class PEC(BaseModel):
         self.fin_pec = True
         for chambre in self.chambres:
             chambre.pec = None
+            chambre.disponible = True
             chambre.save()
         self.save()
         return res
@@ -179,7 +181,7 @@ class Chambre(BaseModel):
     numeroTemporaire = CharField(default="")
     convention = BooleanField(default=False)
     capacite = SmallIntegerField(default=2)
-    disponible = BooleanField(default=False)
+    _disponible = BooleanField(default=False)
     prix = IntegerField()
     
     hotel = ForeignKeyField(Hotel, backref="chambres")
@@ -192,8 +194,16 @@ class Chambre(BaseModel):
         add_str = f" ({self.numeroTemporaire})" if self.numeroTemporaire else ""
         return f"{self.numero}" + add_str
 
+    @property
+    def disponible(self):
+        return self.disponible_pour_alc()
+
+    @disponible.setter
+    def disponible(self, value:bool):
+        self._disponible = value
+    
     def disponible_pour_alc(self):
         """Pour information"""
-        if self.pec or (not self.disponible):
+        if self.pec or (not self._disponible):
             return False
         return True
