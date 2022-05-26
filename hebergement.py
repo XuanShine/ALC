@@ -1,5 +1,6 @@
 
 
+from click import pass_context
 from pywebio import start_server
 from pywebio.input import *
 from pywebio.output import *
@@ -54,14 +55,22 @@ def gestion(tri: str = None, cp: str = None, ville: str = None, nom: str = None,
     # actions()
     return gestion(tri, cp, ville, nom, occupation)
 
-
+def displayButtonDisponible(room):
+        # put_button(f'{"Sélectionner" if room.disponible_pour_alc() else "Voir PEC"}', color=f'{"success" if room.disponible_pour_alc() else "danger"}', onclick=partial(actionRoom, room))
+        if room.disponible_pour_alc():
+            return put_button(f'{"Sélectionner"}', color=f'{"success" if room.disponible_pour_alc() else "danger"}', onclick=partial(actionRoom, room))
+        if room.pec is not None:
+            return put_button(f'{"Voir PEC"}', color=f'{"success" if room.disponible_pour_alc() else "danger"}', onclick=partial(actionRoom, room))
+        else:
+            return put_button(f'{"Non Disponible"}', color=f'{"success" if room.disponible_pour_alc() else "danger"}', disabled=True, onclick=None)
+        
 def showHotel(hotel, open: bool = False):
     # TODO: gérer les chambres temporaires
     try:
         chambres = sorted(hotel.chambres, key=lambda chambre: int(chambre.numero))
     except ValueError:
         chambres = hotel.chambres
-    
+     
     put_collapse(title=f"{hotel.cp} - {hotel.ville} - {hotel.nom} ({hotel.disponibilite()}/{hotel.totalChambres()} libres)",
                  open=open, content=[
 
@@ -76,7 +85,7 @@ def showHotel(hotel, open: bool = False):
             put_text(f"{room.numero} {'' if not room.numeroTemporaire else '-> ' + room.numeroTemporaire}"), None,
             put_text(emojis.encode(":white_check_mark:") if room.convention else emojis.encode(":x:")), None,
             put_text(room.capacite), None,
-            put_button(f'{"Sélectionner" if room.disponible_pour_alc() else "Voir PEC"}', color=f'{"success" if room.disponible_pour_alc() else "danger"}', onclick=partial(actionRoom, room)), None,
+            displayButtonDisponible(room), None,
             put_text(room.prix), None,
             put_button("Modifier", onclick=partial(editRoom, room))
         ]) for room in chambres])
