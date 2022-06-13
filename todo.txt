@@ -1,0 +1,22 @@
+[TODO]
+PEC
+    - "État": "futur" si la date de début est > date actuel
+    - Mettre une couleur si "état: en cours"
+    - Mettre un liste de "demande de facture"
+
+Messagerie
+
+Permissions
+
+Alertes:
+    - Possibilité d’ignorer l’erreur
+    - PEC proche de la fin (14j)
+    - PEC dépassée
+    - Erreur: 2 PEC en même temps
+
+[EN COURS]
+Interface Hotelier
+
+
+[DONE]
+Session Utilisateur
