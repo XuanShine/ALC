@@ -4,12 +4,15 @@ from models import *
 
 from datetime import datetime, date
 
+from werkzeug.security import generate_password_hash, check_password_hash
+
+TABLES = [Famille, Membre, Hotel, PEC, Chambre, User]
 
 def init_fake_datas():
     db.init("local.db")
     with db:
-        db.drop_tables([Famille, Membre, Hotel, PEC, Chambre])
-        db.create_tables([Famille, Membre, Hotel, PEC, Chambre])
+        db.drop_tables(TABLES)
+        db.create_tables(TABLES)
         nguyen = Famille.create(nom="Nguyen")
         paul = Membre.create(prenom="Paul", sexe="M", naissance=date(1994, 10, 25), titre="Père", famille=nguyen, estResponsable=True)
         fils1 = Membre.create(prenom="Edoardo", sexe="M", naissance=date(2019, 1, 5), titre="enfant", famille=nguyen)
@@ -64,6 +67,8 @@ def init_fake_datas():
                    derniere_date_facturee=datetime(2022, 5, 1))
         
         pec.setChambres([1])
+        
+        paul = User.create(username="paul", password=generate_password_hash("auie"), telephone="0651216491")
         
         
 

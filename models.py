@@ -1,6 +1,9 @@
 from peewee import *
-from typing import List
+from typing import List, Text
 from datetime import date, datetime, timedelta
+
+from werkzeug.security import generate_password_hash, check_password_hash
+
 
 db = SqliteDatabase(None)
 
@@ -61,6 +64,7 @@ class Hotel(BaseModel):
     cp = CharField(max_length=5)
     telephone = CharField()
     mail = CharField(max_length=100)
+    notes = TextField(default="")
     # chambres*
 
     def __str__(self):
@@ -207,3 +211,10 @@ class Chambre(BaseModel):
         if self.pec or (not self._disponible):
             return False
         return True
+
+
+class User(BaseModel):
+    username = CharField(unique=True)
+    telephone = CharField()
+    password = CharField()
+    

@@ -8,12 +8,13 @@ from pywebio.platform.flask import webio_view
 import pywebio
 
 from flask import Flask
+from werkzeug.security import generate_password_hash, check_password_hash
 from functools import partial
 
 from famille import GestionFamille
 import hebergement as hotel
 from create_tables import init_fake_datas
-from account import checkConnection
+from account import checkConnection, login, logout
 
 app = Flask(__name__)
 
@@ -23,29 +24,32 @@ class App:
         
     def start(self):
         set_env(output_max_width="80%")
-        # put_buttons(["Se Connecter", "S’inscrire"], onclick=self.login)
-        self.menu()
-
+        # login(basic_auth=lambda username, password: checkConnection(username, password), salt="auie")
+        self.menuUser()
     
-    def login(self, *args):
-        id_ = input("ID:")
-        password = input("Mot de Passe:")
-        assert checkConnection(id_, password)
-        self.id = id_
-        put_text(f"ID: {self.id}")
-        self.menu()
+    def logout(self):
+        logout()
+        clear("all")
+        return self.start()
 
-    
-    def menu(self):
+    @use_scope("all")
+    def menuUser(self):
+        user = login(basic_auth=lambda username, password: checkConnection(username, password), salt="auie")
+        put_text(f"Bonjour {user}")
         put_buttons(buttons=[
             "Ajouter / Rechercher une famille",
-            "Gérer les hébergements"
+            "Gérer les hébergements",
+            "Déconnexion"
         ], onclick=[
             GestionFamille.formAjoutFamille,
-            hotel.gestion
+            hotel.gestion,
+            self.logout
         ])
         put_scope("famille")
         put_scope("main")
+    
+    def menuHotel(self):
+        pass
 
 
 def main():
