@@ -69,6 +69,7 @@ def init_fake_datas():
         pec.setChambres([1])
         
         paul = User.create(username="paul", password=generate_password_hash("auie"), telephone="0651216491")
+        jean = User.create(username="jean", password=generate_password_hash("bépo"), telephone="0651216491")
         
         
 
