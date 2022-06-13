@@ -95,7 +95,7 @@ class GestionFamille:
         famille = Famille.get(id=familleID)
         put_markdown(f"## Famille: {famille}")
         put_text(f"Telephone: {famille.telephone}")
-        put_scrollable(content=["Notes", famille.notes], keep_bottom=True, height=150)
+        put_scrollable(content=["Notes", famille.notes], height=150)
         # put_button("Ajouter Note", onclick=partial(Famille.addRemarque, famille))
         put_markdown(f"### Membres ({len(famille.membres)})")
         put_table([
