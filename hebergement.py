@@ -75,6 +75,7 @@ def showHotel(hotel, open: bool = False):
                  open=open, content=[
 
         put_text(f"ID Hotel: {hotel.id}\n{hotel.hotelname}\n{hotel.adresse}\n{hotel.telephone}\n{hotel.mail}"),
+        put_scrollable(content=["Notes", hotel.notes], height=150),
         put_row([
             put_button("Modifier", onclick=partial(editHotel, hotel)),
             put_button("Ajouter Chambre", onclick=partial(addRoom, hotel))
@@ -124,7 +125,13 @@ def editHotel(hotel):
         input("Mail", name="mail", value=hotel.mail, help_text="Pour des modifications importantes, veuillez contacter l’administrateur.")
     ])
     time = datetime.now().strftime("%d/%m/%Y - %H:%M")
-    hotel.notes = f"{time} : {local['username']}:\n{hotel['mail']} -> {datas['mail']}\n{'-' * 10}\n{hotel.notes}"
+    
+    hotel.notes = f"""{time} : {local['username']}:
+    {hotel.mail} -> {datas['mail']}
+    {hotel.telephone} -> {datas["telephone"]}
+    {'-' * 10}
+    {hotel.notes}"""
+    
     hotel.mail = datas["mail"]
     hotel.telephone = datas["telephone"]
     hotel.save()
@@ -145,10 +152,11 @@ def editRoom(room):
     time = datetime.now().strftime("%d/%m/%Y - %H:%M")
     hotel = room.hotel
     hotel.notes = f"""{time} : {local['username']}:
-    {room.numeroTemporaire} -> {datas["numeroTemporaire"]}
-    {room.capacite} -> {datas["capacite"]}
-    {room.disponible} -> {datas["disponible"]}
-    {room.prix} -> {datas["prix"]}
+    {room.numero}:
+    Numéro Temporaire: {room.numeroTemporaire} -> {datas["numeroTemporaire"]}
+    Capacité: {room.capacite} -> {datas["capacite"]}
+    Dispo: {room.disponible} -> {datas["disponible"]}
+    Prix: {room.prix} -> {datas["prix"]}
     {'-' * 10}
     {hotel.notes}"""
     room.numeroTemporaire = datas["numeroTemporaire"]
