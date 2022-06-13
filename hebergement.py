@@ -129,8 +129,7 @@ def editHotel(hotel):
     hotel.notes = f"""{time} : {local['username']}:
     {hotel.mail} -> {datas['mail']}
     {hotel.telephone} -> {datas["telephone"]}
-    {'-' * 10}
-    {hotel.notes}"""
+    {'-' * 10}\n{hotel.notes}"""
     
     hotel.mail = datas["mail"]
     hotel.telephone = datas["telephone"]
@@ -157,8 +156,7 @@ def editRoom(room):
     Capacité: {room.capacite} -> {datas["capacite"]}
     Dispo: {room.disponible} -> {datas["disponible"]}
     Prix: {room.prix} -> {datas["prix"]}
-    {'-' * 10}
-    {hotel.notes}"""
+    {'-' * 10}\n{hotel.notes}"""
     room.numeroTemporaire = datas["numeroTemporaire"]
     room.capacite = datas["capacite"]
     room.disponible = datas["disponible"]
