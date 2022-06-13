@@ -123,9 +123,10 @@ def editHotel(hotel):
         input("Telephone", name="telephone", value=hotel.telephone),
         input("Mail", name="mail", value=hotel.mail, help_text="Pour des modifications importantes, veuillez contacter l’administrateur.")
     ])
+    time = datetime.now().strftime("%d/%m/%Y - %H:%M")
+    hotel.notes = f"{time} : {local['username']}:\n{hotel['mail']} -> {datas['mail']}\n{'-' * 10}\n{hotel.notes}"
     hotel.mail = datas["mail"]
     hotel.telephone = datas["telephone"]
-    # TODO historique
     hotel.save()
     return gestion(openHotel=hotel)
 
@@ -141,11 +142,20 @@ def editRoom(room):
         input("Prix", type="number", value=room.prix, name="prix")
     ])
 
-    # TODO historique
+    time = datetime.now().strftime("%d/%m/%Y - %H:%M")
+    hotel = room.hotel
+    hotel.notes = f"""{time} : {local['username']}:
+    {room.numeroTemporaire} -> {datas["numeroTemporaire"]}
+    {room.capacite} -> {datas["capacite"]}
+    {room.disponible} -> {datas["disponible"]}
+    {room.prix} -> {datas["prix"]}
+    {'-' * 10}
+    {hotel.notes}"""
     room.numeroTemporaire = datas["numeroTemporaire"]
     room.capacite = datas["capacite"]
     room.disponible = datas["disponible"]
     room.prix = datas["prix"]
+    hotel.save()
     room.save()
     return gestion(openHotel=room.hotel)
     
