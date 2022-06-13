@@ -17,11 +17,11 @@ from hebergement import gestion
 def newPec(famille):
     local.famille = famille
     put_info("Veuillez choisir une ou plusieurs chambres pour la famille")
-    put_markdown(f"### Famille sélectionnée : {local.famille}")
+    put_markdown(f"### Famille sélectionnée : {local.famille}").style("color:red;")
     chambresStr = 'aucun' if local.chambres is None else " - ".join(map(str, local.chambres))
     put_markdown(f"### Hotel sélectionné:")
     with use_scope("chambres"):
-        put_text(chambresStr)
+        put_text(chambresStr).style("color:red;")
     
     put_buttons([{"label": "Reset", "value": "removeFamily", "color": "warning"},
                  {"label": "Enlever Chambres", "value": "removeRoom"},

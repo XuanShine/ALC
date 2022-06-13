@@ -116,7 +116,8 @@ def actionRoom(room):
         else:
             local.chambres.append(room)
         toast("Chambre sélectionnée", color="success")
-        put_markdown(f"**{room.hotel}: {room}**", scope="chambres")
+        put_markdown(f"**{room.hotel}: {room}**", scope="chambres").style("color:red;")
+        scroll_to("famille")
         
 def editHotel(hotel):
     set_env(input_panel_fixed=True)
