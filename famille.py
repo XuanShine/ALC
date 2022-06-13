@@ -189,9 +189,9 @@ class GestionFamille:
     @staticmethod
     def addRemarque(cible: Union[Membre, Famille]):
         note = textarea("Ajouter une note:")
-        # TODO: ajouter le nom de la personne qui a écrit la note
+        username = local["username"]
         time = datetime.now().strftime("%d/%m/%Y - %H:%M")
-        cible.notes = f"{cible.notes}\n{'-' * 10}\n{time} :\n{note}"
+        cible.notes = f"{time} : {username} :\n{note}\n{'-' * 10}\n{cible.notes}"
         cible.save()
         if isinstance(cible, Membre):
             famille = cible.famille
