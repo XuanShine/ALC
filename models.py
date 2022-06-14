@@ -55,11 +55,21 @@ class Membre(BaseModel):
     def __str__(self):
         return f"{self.prenom} {self.nomFamille()} ({self.sexe}) - {self.naissance}"
 
+class User(BaseModel):
+    username = CharField(unique=True)
+    telephone = CharField()
+    password = CharField()
+    contactSiAbsent = ForeignKeyField("self", backref="remplace", default=None, null=True)
+    # hotels*
+    
+    @property
+    def hotel(self):
+        return bool(self.hotels)
 
 class Hotel(BaseModel):
     nom = CharField()
     hotelname = CharField(unique=True)
-    owner =
+    owner = ForeignKeyField(User, backref="hotels")
     adresse = CharField()
     ville = CharField()
     cp = CharField(max_length=5)
@@ -214,9 +224,5 @@ class Chambre(BaseModel):
         return True
 
 
-class User(BaseModel):
-    username = CharField(unique=True)
-    telephone = CharField()
-    password = CharField()
-    contactSiAbsent = ForeignKeyField("self", backref="remplace", default=None, null=True)
+
     

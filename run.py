@@ -11,8 +11,10 @@ from flask import Flask
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import partial
 
+from models import User
 from famille import GestionFamille
 import hebergement as hotel
+import hotelier
 from create_tables import init_fake_datas
 from account import checkConnection, login, logout
 
@@ -24,8 +26,11 @@ class App:
         
     def start(self):
         set_env(output_max_width="80%")
-        # login(basic_auth=lambda username, password: checkConnection(username, password), salt="auie")
-        self.menuUser()
+        username = login(basic_auth=lambda username, password: checkConnection(username, password), salt="auie")
+        user = User.select().where(User.username == username).get()
+        if user.hotel:
+            return hotelier.connect(user)
+        return self.menuUser()
     
     def logout(self):
         logout()
@@ -34,8 +39,8 @@ class App:
 
     @use_scope("all")
     def menuUser(self):
-        user = login(basic_auth=lambda username, password: checkConnection(username, password), salt="auie")
-        put_text(f"Bonjour {user}")
+        username = local["username"]
+        put_text(f"Bonjour {username}")
         put_buttons(buttons=[
             "Ajouter / Rechercher une famille",
             "Gérer les hébergements",
