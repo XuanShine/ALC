@@ -1,3 +1,4 @@
+from functools import wraps
 
 from pywebio.output import *
 from pywebio.input import *
@@ -61,3 +62,7 @@ def login(*, basic_auth=None, custom_auth=None, salt=None, expire_days=7):
 def logout():
     set_localstorage('webio-token', None)
     del local["username"]
+
+
+def needLogin():
+    permission
