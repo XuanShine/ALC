@@ -59,6 +59,7 @@ class Membre(BaseModel):
 class Hotel(BaseModel):
     nom = CharField()
     hotelname = CharField(unique=True)
+    owner =
     adresse = CharField()
     ville = CharField()
     cp = CharField(max_length=5)
@@ -217,4 +218,5 @@ class User(BaseModel):
     username = CharField(unique=True)
     telephone = CharField()
     password = CharField()
+    contactSiAbsent = ForeignKeyField("self", backref="remplace", default=None, null=True)
     

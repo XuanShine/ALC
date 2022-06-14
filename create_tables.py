@@ -22,6 +22,7 @@ def init_fake_datas():
         
         panorama = Hotel(nom="Panorama",
                          hotelname="hotelpanorama",
+                         password=generate_password_hash("àyx."),
                          adresse="2 Cours Honoré Cresp, 06130 Grasse",
                          ville="Grasse",
                          cp = "06130",
@@ -46,6 +47,7 @@ def init_fake_datas():
         
         laposte = Hotel(nom="Hotel de la Poste",
                         hotelname="hotellaposte",
+                        password=generate_password_hash("bépo"),
                         adresse="106 Chemin Qurnade, 06530 Peymeinade",
                         ville="Peymeinade",
                         cp = "06530",

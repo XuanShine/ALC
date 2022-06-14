@@ -8,11 +8,17 @@ Messagerie
 
 Permissions
 
+Gestion des mots de passe
+
 Alertes:
     - Possibilité d’ignorer l’erreur
     - PEC proche de la fin (14j)
     - PEC dépassée
     - Erreur: 2 PEC en même temps
+    - chambre indisponible mais conventionnée
+
+Famille:
+    - contactPrincipal
 
 [EN COURS]
 Interface Hotelier
