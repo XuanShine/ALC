@@ -64,5 +64,21 @@ def logout():
     del local["username"]
 
 
-def needLogin():
-    permission
+def needLogin(role):
+    """role: <directeur>, <assistant>, <hotel>"""
+    def decorate(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            username = login(basic_auth=checkConnection, salt="auie", expire_days=7)
+            user = User.select().where(User.username == username).get()
+            if role == "all" or user.role == role:
+                kwargs["username"] = username
+                kwargs["role"] = user.role
+                return func(*args, **kwargs)
+            else:
+                # TODO : logging invalid access
+                with popup("Accès invalid"):
+                    put_text("Nous n’avez pas les permissions d’accéder à cet espace")
+        return wrapper
+    return decorate
+    
