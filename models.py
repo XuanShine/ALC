@@ -60,6 +60,7 @@ class User(BaseModel):
     telephone = CharField()
     password = CharField()
     contactSiAbsent = ForeignKeyField("self", backref="remplace", default=None, null=True)
+    role = CharField()
     # hotels*
     
     @property
