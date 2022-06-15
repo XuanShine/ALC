@@ -20,8 +20,8 @@ def init_fake_datas():
         jean = Membre.create(prenom="Jean", sexe="M", naissance=date(1995, 12, 1), titre="Père", famille=nguyen2, estResponsable=True)
         julie = Membre.create(prenom="Julie", sexe="F", naissance=date(2018, 2, 19), titre="enfant", famille=nguyen2)
         
-        aroma = User.create(username="aroma", telephone="0651216491", password=generate_password_hash("bépo"))
-        hocine = User.create(username="hocine", telephone="0651216491", password=generate_password_hash("bépo"))
+        aroma = User.create(username="aroma", telephone="0651216491", password=generate_password_hash("bépo"), role="hotel")
+        hocine = User.create(username="hocine", telephone="0651216491", password=generate_password_hash("bépo"), role="hotel")
         panorama = Hotel(nom="Panorama",
                          hotelname="hotelpanorama",
                          owner=aroma,
@@ -72,8 +72,8 @@ def init_fake_datas():
         
         pec.setChambres([1])
         
-        paul = User.create(username="paul", password=generate_password_hash("auie"), telephone="0651216491")
-        jean = User.create(username="jean", password=generate_password_hash("bépo"), telephone="0651216491")
+        paul = User.create(username="paul", password=generate_password_hash("auie"), telephone="0651216491", role="assistant")
+        jean = User.create(username="jean", password=generate_password_hash("bépo"), telephone="0651216491", role="directeur")
         
         
 
