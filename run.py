@@ -12,35 +12,52 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from functools import partial
 
 from models import User
+
 from famille import GestionFamille
 import hebergement as hotel
-import hotelier
 from create_tables import init_fake_datas
-from account import checkConnection, login, logout
+from account import checkConnection, login, logout, needLogin
+import hotelier
 
 app = Flask(__name__)
 
 class App:
     def __init__(self):
         self.id = None
-        
-    def start(self):
+    
+    @needLogin(role="all")
+    def start(self, **kwargs):
         set_env(output_max_width="80%")
-        username = login(basic_auth=lambda username, password: checkConnection(username, password), salt="auie")
-        user = User.select().where(User.username == username).get()
-        if user.hotel:
-            return hotelier.connect(user)
-        return self.menuUser()
+        # breakpoint()
+        if kwargs["role"] == "assistant":
+            self.menuUser()
+        elif kwargs["role"] == "hotel":
+            self.menuHotel()
+        # breakpoint()
     
     def logout(self):
         logout()
         clear("all")
         return self.start()
 
+    @needLogin(role="hotel")
+    @use_scope("all", clear=True)
+    def menuHotel(self, **kwargs):
+        put_text(f"Bonjour {kwargs['username']}")
+        put_buttons(buttons=[
+            "Gérer les hébergements",
+            "Déconnexion"
+        ], onclick=[
+            hotelier.connect,
+            self.logout
+        ])
+        put_scope("main")
+        hotelier.connect(**kwargs)
+    
+    @needLogin(role="assistant")
     @use_scope("all")
-    def menuUser(self):
-        username = local["username"]
-        put_text(f"Bonjour {username}")
+    def menuUser(self, **kwargs):
+        put_text(f"Bonjour {kwargs['username']}")
         put_buttons(buttons=[
             "Ajouter / Rechercher une famille",
             "Gérer les hébergements",
@@ -52,9 +69,6 @@ class App:
         ])
         put_scope("famille")
         put_scope("main")
-    
-    def menuHotel(self):
-        pass
 
 
 def main():
