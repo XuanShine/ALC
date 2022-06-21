@@ -1,3 +1,4 @@
+from account import needLogin
 from click import pass_context
 from pywebio import start_server
 from pywebio.input import *
@@ -18,8 +19,10 @@ from models import *
 from utils import sure
 from hebergement import showHotel
 
-def connect(user):
+def connect(**kwargs):
     # TODO : à finir
+    user = User.select().where(User.username == kwargs["username"]).get()
+    # breakpoint()
     for hotel in user.hotels:
         showHotel(hotel, open=True)
     session.hold()

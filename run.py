@@ -36,8 +36,8 @@ class App:
         # breakpoint()
     
     def logout(self):
-        logout()
         clear("all")
+        logout()
         return self.start()
 
     @needLogin(role="hotel")
@@ -48,7 +48,7 @@ class App:
             "Gérer les hébergements",
             "Déconnexion"
         ], onclick=[
-            hotelier.connect,
+            partial(self.menuHotel, **kwargs),
             self.logout
         ])
         put_scope("main")
