@@ -8,6 +8,7 @@ from pywebio_battery import *
 from tornado.web import create_signed_value, decode_signed_value
 
 from werkzeug.security import generate_password_hash, check_password_hash
+from peewee import DoesNotExist
 
 from models import User
 
@@ -70,7 +71,11 @@ def needLogin(role):
         @wraps(func)
         def wrapper(*args, **kwargs):
             username = login(basic_auth=checkConnection, salt="auie", expire_days=7)
-            user = User.select().where(User.username == username).get()
+            try:
+                user = User.select().where(User.username == username).get()
+            except DoesNotExist:
+                logout()
+                return
             if role == "all" or user.role == role:
                 kwargs["username"] = username
                 kwargs["role"] = user.role
