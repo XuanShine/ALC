@@ -1,8 +1,9 @@
+from turtle import onclick
 from pywebio import start_server
 from pywebio.input import *
 from pywebio.output import *
 from pywebio_battery import put_logbox
-from pywebio.session import local
+from pywebio.session import local, hold
 from pywebio.session import set_env
 from pywebio.platform.flask import webio_view
 import pywebio
@@ -19,22 +20,25 @@ def view():
     displayPEC()
     displayFamille()
     displayHotel()
-    input("")
+    actions(buttons=["Continue"])
+    return view()
 
 def displayPEC():
     with put_collapse("PEC"):
         today = date.today()
         query = PEC.select()
+        affichage = {"texte": [], "button": []}
         for pec in query:
             message = f"{pec.famille} : {pec.hotel}, fin: {pec.date_fin} ({(pec.date_fin - today).days} jours)"
-            with put_row():
-                if pec.retard_pec():
-                    put_text(message).style("color: red;")
-                elif pec.proche_fin():
-                    put_text(message).style("color: orange;")
-                else:
-                    continue
-                put_button("Voir PEC", onclick=partial(GestionFamille.viewFamille, pec.famille.id))
+            if pec.retard_pec():
+                style = "color: red;"
+            elif pec.proche_fin():
+                style = "color: orange;"
+            else:
+                continue
+            affichage["texte"].append(put_text(message).style(style))
+            affichage["button"].append(put_button("Voir PEC", onclick=partial(GestionFamille.viewFamille, pec.famille.id)))
+        put_table([[boutton, texte] for boutton, texte in zip(affichage["button"], affichage["texte"])]) # , cell_widths="10% 99%")
     return
 
 def displayFamille():
