@@ -70,7 +70,7 @@ class User(BaseModel):
 class Hotel(BaseModel):
     nom = CharField()
     hotelname = CharField(unique=True)
-    owner = ForeignKeyField(User, backref="hotels")
+    owner = ForeignKeyField(User, backref="hotels", null=True)
     adresse = CharField()
     ville = CharField()
     cp = CharField(max_length=5)
@@ -85,6 +85,9 @@ class Hotel(BaseModel):
     
     def disponibilite(self):
         return len([chambre for chambre in self.chambres if chambre.disponible_pour_alc()])
+
+    def disponibiliteConvention(self):
+        return len([chambre for chambre in self.chambres if chambre.disponible_pour_alc() and chambre.convention])
     
     def totalChambres(self):
         return len(self.chambres)
