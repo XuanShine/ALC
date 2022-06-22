@@ -188,7 +188,7 @@ def init_fake_datas():
                 
                 # Chambres
                 centaine = randint(1, 6)
-                nombre = randint(2, 8)
+                nombre = randint(3, 9)
                 for i in range(nombre):
                     i += 1
                     Chambre.create(numero=f"{centaine}0{i}",
@@ -208,7 +208,7 @@ def init_fake_datas():
                 nom.add(row[1])
                 prenom.add(row[0])
         familles = []
-        for i in range(30):
+        for i in range(20):
             famille = Famille.create(nom=choice(list(nom)))
             for j in range(randint(1, 5)):
                 if j == 0:
