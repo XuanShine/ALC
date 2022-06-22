@@ -1,6 +1,5 @@
 [TODO]
 PEC
-    - Mettre une couleur si "état: en cours"
     - Mettre un liste de "demande de facture"
 
 Messagerie
@@ -26,3 +25,4 @@ Session Utilisateur
 PEC - "État": "futur" si la date de début est > date actuel
 Alerte    - PEC proche de la fin (14j)
 Alerte    - PEC dépassée
+PEC     - Mettre une couleur si "état: en cours" -> vert

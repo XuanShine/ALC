@@ -202,7 +202,7 @@ class PEC(BaseModel):
         if self.proche_fin():
             return "background-color: orange;"
         else:
-            return ""
+            return "background-color: green;"
     
 
 class Chambre(BaseModel):

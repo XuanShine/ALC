@@ -207,7 +207,7 @@ class GestionFamille:
                 pec.date_debut.strftime("%d/%m/%Y"),
                 pec.derniere_date_facturee.strftime("%d/%m/%Y"),
                 put_text(pec.date_fin.strftime("%d/%m/%Y")).style(pec.style()),
-                "Fini" if pec.fin_pec else "En Cours",
+                pec.etat(),
                 pec.hotel,
                 pec.get_chambres(),
                 put_row([
