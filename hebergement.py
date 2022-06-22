@@ -71,7 +71,7 @@ def showHotel(hotel, open: bool = False):
     except ValueError:
         chambres = hotel.chambres
      
-    put_collapse(title=f"{hotel.cp} - {hotel.ville} - {hotel.nom} ({hotel.disponibilite()}/{hotel.totalChambres()} libres)",
+    put_collapse(title=f"{hotel.cp} - {hotel.ville} - {hotel.nom} ({hotel.disponibilite()}/{hotel.totalChambres()} libres) ({hotel.disponibiliteConvention()} conventionnées libres)",
                  open=open, content=[
 
         put_text(f"ID Hotel: {hotel.id}\n{hotel.hotelname}\n{hotel.adresse}\n{hotel.telephone}\n{hotel.mail}"),
