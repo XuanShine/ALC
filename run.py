@@ -13,6 +13,7 @@ from functools import partial
 
 from models import User
 
+import alerte
 from famille import GestionFamille
 import hebergement as hotel
 from create_tables import init_fake_datas
@@ -61,10 +62,12 @@ class App:
         put_buttons(buttons=[
             "Ajouter / Rechercher une famille",
             "Gérer les hébergements",
+            "Voir les alertes",
             "Déconnexion"
         ], onclick=[
             GestionFamille.formAjoutFamille,
             hotel.gestion,
+            alerte.view,
             self.logout
         ])
         put_scope("famille")

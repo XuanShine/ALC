@@ -1,6 +1,5 @@
 [TODO]
 PEC
-    
     - Mettre une couleur si "état: en cours"
     - Mettre un liste de "demande de facture"
 
@@ -10,8 +9,6 @@ Gestion des mots de passe
 
 Alertes:
     - Possibilité d’ignorer l’erreur
-    - PEC proche de la fin (14j)
-    - PEC dépassée
     - Erreur: 2 PEC en même temps
     - chambre indisponible mais conventionnée
 
@@ -27,3 +24,5 @@ Permissions
 [DONE]
 Session Utilisateur
 PEC - "État": "futur" si la date de début est > date actuel
+Alerte    - PEC proche de la fin (14j)
+Alerte    - PEC dépassée
