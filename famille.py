@@ -22,6 +22,8 @@ class GestionFamille:
     def formAjoutFamille():
         set_env(input_panel_fixed=True, input_panel_init_height=175)
         
+        put_button("Voir toutes les Familles", onclick=GestionFamille.viewAllFamily)
+        
         def render_famille(famille):
             put_column([
                 put_markdown(f"## {famille}"),
@@ -219,3 +221,13 @@ class GestionFamille:
             ],
             header=["Début", "Dernière Facture", "Fin Prévu", "État", "Hôtel", "Chambre", "Action"]
         )
+    
+    @staticmethod
+    @use_scope("main", clear=True)
+    def viewAllFamily():
+        query = Famille.select()
+        put_table(header=["Familles", "Action"], tdata=[
+        [put_text(str(famille)),
+         put_button("Voir famille", onclick=partial(GestionFamille.viewFamille, famille.id))
+        ] for famille in query])
+            
