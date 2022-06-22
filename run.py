@@ -29,6 +29,7 @@ class App:
     @needLogin(role="all")
     def start(self, **kwargs):
         set_env(output_max_width="80%")
+        pywebio.config(title="ALC", description="Logiciel de gestion PAU")
         # breakpoint()
         if kwargs["role"] == "assistant":
             self.menuUser()
