@@ -230,7 +230,6 @@ def init_fake_datas():
                 if not chambre.disponible:
                     continue
                 else:
-                    print(chambre.id)
                     pec.setChambres([chambre])
                     break
 
