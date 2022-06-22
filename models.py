@@ -179,6 +179,16 @@ class PEC(BaseModel):
         self.save()
         return res
 
+    def etat(self):
+        today = date.today()
+        if self.fin_pec:
+            return "Fini"
+        elif today < self.date_debut:
+            return "Futur"
+        else:
+            return "En Cours"
+        
+
     def get_chambres(self):
         return self.historique_chambres if self.fin_pec else " ".join(map(str, self.chambres))
 

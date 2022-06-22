@@ -1,12 +1,10 @@
 [TODO]
 PEC
-    - "État": "futur" si la date de début est > date actuel
+    
     - Mettre une couleur si "état: en cours"
     - Mettre un liste de "demande de facture"
 
 Messagerie
-
-Permissions
 
 Gestion des mots de passe
 
@@ -25,5 +23,7 @@ Interface Hotelier
 Permissions
 
 
+
 [DONE]
 Session Utilisateur
+PEC - "État": "futur" si la date de début est > date actuel
