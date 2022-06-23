@@ -7,6 +7,7 @@ from pywebio.output import *
 from pywebio_battery import put_logbox
 from pywebio.pin import *
 from pywebio.session import set_env, local
+from pywebio import session
 
 from functools import partial
 from typing import Union
@@ -76,20 +77,28 @@ def showHotel(hotel, open: bool = False):
 
         put_text(f"ID Hotel: {hotel.id}\n{hotel.hotelname}\n{hotel.adresse}\n{hotel.telephone}\n{hotel.mail}"),
         put_scrollable(content=["Notes", hotel.notes], height=150),
-        put_row([
-            put_button("Modifier", onclick=partial(editHotel, hotel)),
-            put_button("Ajouter Chambre", onclick=partial(addRoom, hotel))
-        ]),
-        put_row([put_text(header) for header in ["Numéro", "Convention", "Capacité", "Libre ?", "Prix", "Action"]])
-        ] + [
-        put_row([
-            put_text(f"{room.numero} {'' if not room.numeroTemporaire else '-> ' + room.numeroTemporaire}"), None,
-            put_text(emojis.encode(":white_check_mark:") if room.convention else emojis.encode(":x:")), None,
-            put_text(room.capacite), None,
-            displayButtonDisponible(room), None,
-            put_text(room.prix), None,
-            put_button("Modifier", onclick=partial(editRoom, room))
-        ]) for room in chambres])
+        put_buttons(["Modifier", "Ajouter Chambre"], onclick=[partial(editHotel, hotel), partial(addRoom, hotel)]),
+        put_table(header=["Numéro", "Convention", "Capacité", "Libre ?", "Prix", "Action"], tdata=[
+            [
+                put_text(f"{room.numero} {'' if not room.numeroTemporaire else '-> ' + room.numeroTemporaire}"),
+                put_text(emojis.encode(":white_check_mark:") if room.convention else emojis.encode(":x:")), 
+                put_text(room.capacite), 
+                displayButtonDisponible(room),
+                put_text(room.prix),
+                put_button("Modifier", onclick=partial(editRoom, room))
+            ] for room in chambres
+        ])])
+        # put_row([put_text(header) for header in ["Numéro", "Convention", "Capacité", "Libre ?", "Prix", "Action"]])
+        # ] + [
+        # put_row([
+        #     put_text(f"{room.numero} {'' if not room.numeroTemporaire else '-> ' + room.numeroTemporaire}"), None,
+        #     put_text(emojis.encode(":white_check_mark:") if room.convention else emojis.encode(":x:")), None,
+        #     put_text(room.capacite), None,
+        #     displayButtonDisponible(room), None,
+        #     put_text(room.prix), None,
+        #     put_button("Modifier", onclick=partial(editRoom, room))
+        # ]) for room in chambres])
+        
     return
 
 def actionRoom(room):
@@ -120,7 +129,10 @@ def actionRoom(room):
         scroll_to("famille")
         
 def editHotel(hotel):
-    set_env(input_panel_fixed=True)
+    if session.info.user_agent.is_mobile:
+        set_env(input_panel_fixed=False)
+    else:
+        set_env(input_panel_fixed=True)
     datas = input_group(f"Modification {hotel.nom}", inputs=[
         input("Telephone", name="telephone", value=hotel.telephone),
         input("Mail", name="mail", value=hotel.mail, help_text="Pour des modifications importantes, veuillez contacter l’administrateur.")
