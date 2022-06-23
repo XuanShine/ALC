@@ -263,10 +263,14 @@ class Review(BaseModel):
     def userDidLike(self, user):
         return user in self.upvoters
     
-    def like(self, user):
-        self.upvoters.add(user)
+    def like(self, user, reload=lambda: None):
+        if self.userDidLike(user):
+            self.upvoters.remove(user)
+        else:
+            self.upvoters.add(user)
+        reload()
     
-    def unlike(self, user):
-        self.upvoters.remove(user)
+    # def unlike(self, user):
+    #     self.upvoters.remove(user)
 
 UserUpvote = Review.upvoters.get_through_model()

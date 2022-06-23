@@ -36,7 +36,7 @@ def view(*args, **kwargs):
             put_buttons(buttons=[
                 {"label": "Discuter", "value": "discuss"},
                 {"label": "👍" if not requete.userDidLike(user) else "👎", "value": "like"}],
-                onclick=[partial(discuss, requete, user), partial(like, requete, user)])
+                onclick=[partial(discuss, requete, user), partial(requete.like, user, view)])
             
             ] for requete in query
         ])
@@ -53,11 +53,4 @@ def discuss(requete, user):
 def addRequete(user):
     text = textarea(placeholder="Votre demande", required=True)
     Review.create(demande=user, request=text)
-    return view()
-
-def like(requete, user):
-    if requete.userDidLike(user):
-        requete.unlike(user)
-    else:
-        requete.like(user)
     return view()
