@@ -1,4 +1,7 @@
-import sys
+import os, sys
+
+C = os.path.abspath(os.path.dirname(__file__))
+sys.path.append(C)
 
 from models import *
 
@@ -12,7 +15,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 TABLES = [Famille, Membre, Hotel, PEC, Chambre, User]
 
 def init_fake_datas():
-    db.init("local.db")
+    db.init(sys.path.join(C, "local.db"))
     with db:
         db.drop_tables(TABLES)
         db.create_tables(TABLES)
@@ -163,7 +166,7 @@ def init_fake_datas():
         ch208 = Chambre.select().join(Hotel).where((Chambre.numero == "208") & (Hotel.nom == "Panorama")).get()
         pec.setChambres([ch208])
         
-        with open("mock_cp.txt", "r", encoding="utf8") as f_in:
+        with open(sys.path.join(C, "mock_cp.txt"), "r", encoding="utf8") as f_in:
             data = f_in.readlines()
         cp = dict()
         for line in data:
@@ -171,7 +174,7 @@ def init_fake_datas():
             cp[f"06{code}"] = city
         
         hotels = []
-        with open("mock_hotel.csv", "r", encoding="utf8") as f_in:
+        with open(sys.path.join(C, "mock_hotel.csv"), "r", encoding="utf8") as f_in:
             reader = csv.reader(f_in)
             reader.__next__()
             for row in reader:
@@ -201,7 +204,7 @@ def init_fake_datas():
         # Famille
         nom = set()
         prenom = set()
-        with open("mock_name.csv", "r", encoding="utf8") as f_in:
+        with open(sys.path.join(C, "mock_name.csv"), "r", encoding="utf8") as f_in:
             reader = csv.reader(f_in)
             reader.__next__()
             for row in reader:
