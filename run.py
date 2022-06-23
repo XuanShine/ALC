@@ -27,6 +27,7 @@ import hebergement as hotel
 from create_tables import init_fake_datas
 from account import checkConnection, login, logout, needLogin
 import hotelier
+import review
 
 app = Flask(__name__)
 # app.config["SECRET_KEY"] = "123465798"
@@ -77,11 +78,13 @@ class App:
             "Ajouter / Rechercher une famille",
             "Gérer les hébergements",
             "Voir les alertes",
+            "Signaler au développeur",
             "Déconnexion"
         ], onclick=[
             GestionFamille.formAjoutFamille,
             hotel.gestion,
             alerte.view,
+            review.view,
             self.logout
         ])
         put_scope("famille")

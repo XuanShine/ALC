@@ -1,4 +1,5 @@
 [TODO]
+
 PEC
     - Mettre un liste de "demande de facture"
     - Lors d’une fin de PEC, ne pas mettre "etat" à "fini"
@@ -30,3 +31,4 @@ PEC - "État": "futur" si la date de début est > date actuel
 Alerte    - PEC proche de la fin (14j)
 Alerte    - PEC dépassée
 PEC     - Mettre une couleur si "état: en cours" -> vert
+Ajout d’un formulaire pour améliorer le logiciel et signaler les bugs

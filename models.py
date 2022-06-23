@@ -237,6 +237,36 @@ class Chambre(BaseModel):
             return False
         return True
 
-
-
+class Review(BaseModel):
+    demande = ForeignKeyField(User, backref="demandes")
+    date = DateTimeField(default=datetime.now())
+    request = TextField()
+    fini = BooleanField(default=False)
+    upvoters = ManyToManyField(User, backref="upvotes")
+    _notes = TextField(default="")
     
+    @property
+    def popularity(self):
+        return len(self.upvoters)
+    
+    @property
+    def notes(self):
+        return self._notes
+    
+    @notes.setter
+    def notes(self, text):
+        limit = "----------------"
+        time = datetime.now().strftime("%d/%m/%Y, %H:%M")
+        self._notes += f"\n{limit}\n{time}:{text}\n"
+        self.save()
+    
+    def userDidLike(self, user):
+        return user in self.upvoters
+    
+    def like(self, user):
+        self.upvoters.add(user)
+    
+    def unlike(self, user):
+        self.upvoters.remove(user)
+
+UserUpvote = Review.upvoters.get_through_model()

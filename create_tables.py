@@ -12,7 +12,7 @@ from datetime import datetime, date
 
 from werkzeug.security import generate_password_hash, check_password_hash
 
-TABLES = [Famille, Membre, Hotel, PEC, Chambre, User]
+TABLES = [Famille, Membre, Hotel, PEC, Chambre, User, UserUpvote, Review]
 
 def init_fake_datas():
     db.init(os.path.join(C, "local.db"))
@@ -235,6 +235,9 @@ def init_fake_datas():
                 else:
                     pec.setChambres([chambre])
                     break
+        
+        # Requete
+        requete = Review.create(demande=paul, request="Ajouter une barre de recherche pour les hotels.")
 
                 
 
