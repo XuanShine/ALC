@@ -1,6 +1,10 @@
 [TODO]
 PEC
     - Mettre un liste de "demande de facture"
+    - Lors d’une fin de PEC, ne pas mettre "etat" à "fini"
+
+Hotel
+    - Bouton pour ajouter des notes à l’hôtel
 
 Messagerie
 
