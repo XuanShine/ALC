@@ -4,6 +4,7 @@ from pywebio.output import *
 from pywebio_battery import put_logbox
 from pywebio.session import local
 from pywebio.session import set_env
+from pywebio import session
 from pywebio.platform.flask import webio_view
 import pywebio
 
@@ -28,7 +29,10 @@ class App:
     
     @needLogin(role="all")
     def start(self, **kwargs):
-        set_env(output_max_width="80%")
+        if session.info.user_agent.is_mobile:
+            set_env(input_panel_fixed=False, input_auto_focus=False, output_max_width="100%")
+        else:
+            set_env(output_max_width="80%")
         pywebio.config(title="ALC", description="Logiciel de gestion PAU")
         # breakpoint()
         if kwargs["role"] == "assistant":
@@ -57,7 +61,7 @@ class App:
         hotelier.connect(**kwargs)
     
     @needLogin(role="assistant")
-    @use_scope("all")
+    @use_scope("all", clear=True)
     def menuUser(self, **kwargs):
         put_text(f"Bonjour {kwargs['username']}")
         put_buttons(buttons=[
@@ -73,6 +77,8 @@ class App:
         ])
         put_scope("famille")
         put_scope("main")
+        actions(buttons=["Continue"])
+        return self.menuUser()
 
 
 def main():

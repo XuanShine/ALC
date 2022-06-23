@@ -7,6 +7,7 @@ from pywebio import start_server
 from pywebio.input import *
 from pywebio.output import *
 from pywebio.session import local, set_env
+from pywebio import session
 from pywebio_battery import put_logbox
 from pywebio.pin import *
 
@@ -20,7 +21,10 @@ class GestionFamille:
     @staticmethod
     @use_scope("main", clear=True)
     def formAjoutFamille():
-        set_env(input_panel_fixed=True, input_panel_init_height=175)
+        if session.info.user_agent.is_mobile:
+            set_env(input_panel_fixed=False)
+        else:
+            set_env(input_panel_fixed=True, input_panel_init_height=175)
         
         put_button("Voir toutes les Familles", onclick=GestionFamille.viewAllFamily)
         
