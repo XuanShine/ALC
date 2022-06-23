@@ -1,3 +1,8 @@
+import os, sys
+
+C = os.path.abspath(os.path.dirname(__file__))
+sys.path.append(C)
+
 from pywebio import start_server
 from pywebio.input import *
 from pywebio.output import *
@@ -10,9 +15,11 @@ import pywebio
 
 from flask import Flask
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_admin import Admin
 from functools import partial
+import peewee
 
-from models import User
+from models import User, db
 
 import alerte
 from famille import GestionFamille
@@ -22,6 +29,8 @@ from account import checkConnection, login, logout, needLogin
 import hotelier
 
 app = Flask(__name__)
+# app.config["SECRET_KEY"] = "123465798"
+# admin = Admin(app, name="ALC", template_mode="bootstrap3")
 
 class App:
     def __init__(self):
@@ -85,7 +94,7 @@ def main():
     App().start()
     
 init_fake_datas()
-
+# b.init("local.db")
 
 start_server(main, port=5001, debug=True, host="0.0.0.0")
 
