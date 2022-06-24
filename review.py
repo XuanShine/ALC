@@ -21,7 +21,9 @@ from account import needLogin
 @needLogin(role="assistant")
 def view(*args, **kwargs):
     put_markdown(r"## Veuillez signaler des bugs ou améliorations possibles.")
-    query = Review.select()
+    query = Review.select().where(Review.fini == False)
+    query = sorted(query, key=lambda req: req.popularity, reverse=True)
+    queryFini = Review.select().where(Review.fini == True)
     user = User.select().where(User.username == kwargs["username"]).get()
     if len(query) == 0:
         put_text("Aucune requête")
@@ -39,6 +41,19 @@ def view(*args, **kwargs):
                 onclick=[partial(discuss, requete, user), partial(requete.like, user, view)])
             
             ] for requete in query
+        ] + [[
+            put_text(emojis.encode(":white_check_mark:") if requete.fini else emojis.encode(":x:")),
+            put_text(requete.request),
+            put_text(f"{requete.popularity} 👍"),
+            put_collapse(title="", content=[
+                put_scrollable(content=[requete.notes], keep_bottom=True)
+            ]),
+            put_buttons(buttons=[
+                {"label": "Discuter", "value": "discuss"},
+                {"label": "👍" if not requete.userDidLike(user) else "👎", "value": "like"}],
+                onclick=[partial(discuss, requete, user), partial(requete.like, user, view)])
+            
+            ] for requete in queryFini
         ])
     action = actions(buttons=[("Ajouter une requete", "add")])
     if action == "add":
