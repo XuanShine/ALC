@@ -96,8 +96,8 @@ class App:
 def main():
     App().start()
     
-init_fake_datas()
-# b.init("local.db")
+# init_fake_datas()
+db.init("local.db")
 
 start_server(main, port=5001, debug=True, host="0.0.0.0")
 
