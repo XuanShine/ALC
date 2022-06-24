@@ -238,6 +238,9 @@ def init_fake_datas():
         
         # Requete
         requete = Review.create(demande=paul, request="Ajouter une barre de recherche pour les hotels.")
+        requete = Review.create(demande=paul, request="Bouton pour ajouter des notes à l’hôtel")
+        requete.upvoters.add(jean)
+        requete = Review.create(demande=paul, request="Permettre aux assistantes de signaler des bugs", fini=True)
 
                 
 
