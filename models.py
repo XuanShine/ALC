@@ -263,12 +263,12 @@ class Review(BaseModel):
     def userDidLike(self, user):
         return user in self.upvoters
     
-    def like(self, user, reload=lambda: None):
+    def like(self, user, nextFunc=lambda: None):
         if self.userDidLike(user):
             self.upvoters.remove(user)
         else:
             self.upvoters.add(user)
-        reload()
+        nextFunc()
     
     # def unlike(self, user):
     #     self.upvoters.remove(user)
